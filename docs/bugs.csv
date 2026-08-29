@@ -1,0 +1,13 @@
+id,title,severity,class,found_by,area,status,resolution
+SOD-001,"""Has"" VN filters never compiled into API predicates",medium,functionality,unit-test,src/lib/vndb/filters.ts,fixed,"Compile flags to has_* predicates; regression test added"
+SOD-002,searchrank sort active without a search filter,medium,correctness,code-review,src/pages/*BrowsePage.tsx,fixed,Degrade searchrank to rating when query blank
+SOD-003,Random quote batch collapsed by in-flight dedupe,low,ux,code-review,src/pages/VnDetailPage.tsx,fixed,Single or-chain query of random predicates
+SOD-004,List-row busy flags read non-reactively,low,reactivity,code-review,src/pages/MyListPage.tsx,fixed,Subscribe busy map and pass via props
+SOD-005,devstatus badge comparison unreachable,low,typing,tsc,src/components/VnCard.tsx,fixed,Explicit undefined and zero checks
+SOD-006,Tag inclusive toggle offered non-API semantics,low,api-semantics,code-review,src/components/FiltersPanel.tsx,fixed,Removed toggle; includes are AND
+SOD-007,Wide layout toggle had no CSS effect,low,functionality,ui-review,src/styles/index.css,fixed,Added data-wide overrides; Shell applies attribute
+SOD-008,Dead default React imports across 17 modules,trivial,hygiene,tsc,src/**,fixed,Removed; kept named hook imports
+SOD-009,react-router advisories (2 moderate),medium,security-dependency,npm-audit,package.json,fixed,Upgraded react-router-dom 6.30.6 to 7.18.3
+SOD-010,Guest shelf lookup typed as scalar vs map,medium,typing-crash,tsc,src/pages/MyListPage.tsx,fixed,Correct generic Record<string,UserInfo|null>
+SOD-011,Staff grouping dropped aid link targets,low,typing-functionality,tsc,src/pages/VnDetailPage.tsx,fixed,Typed group map as VnStaffEntry[]
+SOD-012,Nonexistent mock API in client tests,trivial,testing,vitest,src/lib/vndb/client.test.ts,fixed,Explicit default mock implementation
