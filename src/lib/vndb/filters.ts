@@ -12,8 +12,10 @@ export const F = {
   gte: (field: string, value: unknown): Filter => [field, '>=', value],
   lt: (field: string, value: unknown): Filter => [field, '<', value],
   lte: (field: string, value: unknown): Filter => [field, '<=', value],
-  and: (...preds: (Filter | null | undefined | false)[]): Filter => ['and', ...preds.filter(Boolean)],
-  or: (...preds: (Filter | null | undefined | false)[]): Filter => ['or', ...preds.filter(Boolean)],
+  and: (...preds: (Filter | null | undefined | false)[]): Filter =>
+    normalizeBooleanGroups(['and', ...preds.filter(Boolean)]) as Filter,
+  or: (...preds: (Filter | null | undefined | false)[]): Filter =>
+    normalizeBooleanGroups(['or', ...preds.filter(Boolean)]) as Filter,
 
   id: (id: string): Filter => ['id', '=', id],
   idsOr: (ids: string[]): Filter =>
@@ -40,6 +42,27 @@ export const F = {
   }
 };
 
+/**
+ * Collapses degenerate boolean groups before they reach the API.
+ *
+ * The kana docs define `and`/`or` as "followed by two or more other
+ * predicates"; several call sites (roulette with constraints off, a single
+ * language/trait chip) can produce `["and", pred]` or empty groups. This pass
+ * unwraps single-child groups, drops empty ones, and recurses — all of which
+ * are semantically identical rewrites, so it is always safe to apply.
+ */
+export function normalizeBooleanGroups(f: unknown): unknown {
+  if (!Array.isArray(f) || f.length === 0) return f;
+  const kids = f.slice(1).map(normalizeBooleanGroups).filter(
+    (k) => Array.isArray(k) && k.length > 0
+  );
+  if ((f[0] === 'and' || f[0] === 'or') && kids.length === 1) return kids[0];
+  if ((f[0] === 'and' || f[0] === 'or') && kids.length === 0) return [];
+  if ((f[0] === 'and' || f[0] === 'or')) return [f[0], ...kids];
+  // Plain predicate: keep as-is but normalize any nested groups inside values.
+  return [f[0], ...f.slice(1).map((v) => (Array.isArray(v) && v.length > 0 && (v[0] === 'and' || v[0] === 'or') ? normalizeBooleanGroups(v) : v))];
+}
+
 /** Normalizes a possibly-empty filter tree (single child unwrap, no children). */
 export function normalizeFilter(f: Filter | null): Filter | null {
   if (!f || f.length === 0) return null;
@@ -54,10 +77,12 @@ export function normalizeFilter(f: Filter | null): Filter | null {
 
 /** Combines multiple optional filters with AND, unwrapping when possible. */
 export function andAll(...preds: (Filter | null | undefined | false)[]): Filter | null {
-  const list = preds.filter(Boolean) as Filter[];
+  const list = preds.filter(
+    (p): p is Filter => !!p && (!Array.isArray(p) || p.length > 0)
+  );
   if (list.length === 0) return null;
   if (list.length === 1) return list[0];
-  return ['and', ...list];
+  return normalizeBooleanGroups(['and', ...list]) as Filter;
 }
 
 /* ------------------------------ VN browse model ----------------------------- */
