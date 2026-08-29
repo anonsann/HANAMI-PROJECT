@@ -1,9 +1,13 @@
+# Copy this file to .github/workflows/ci.yml to activate CI
+# (creating workflow files requires a token with the `workflows` permission):
+#   mkdir -p .github/workflows && cp docs/examples/ci.yml .github/workflows/ci.yml
 name: ci
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   gate:
@@ -16,7 +20,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install
+      - name: Install (clean — guards against lockfile drift, see SOD-013)
         run: npm ci
 
       - name: Typecheck

@@ -1,13 +1,31 @@
 id,title,severity,class,found_by,area,status,resolution
-SOD-001,"""Has"" VN filters never compiled into API predicates",medium,functionality,unit-test,src/lib/vndb/filters.ts,fixed,"Compile flags to has_* predicates; regression test added"
-SOD-002,searchrank sort active without a search filter,medium,correctness,code-review,src/pages/*BrowsePage.tsx,fixed,Degrade searchrank to rating when query blank
-SOD-003,Random quote batch collapsed by in-flight dedupe,low,ux,code-review,src/pages/VnDetailPage.tsx,fixed,Single or-chain query of random predicates
-SOD-004,List-row busy flags read non-reactively,low,reactivity,code-review,src/pages/MyListPage.tsx,fixed,Subscribe busy map and pass via props
-SOD-005,devstatus badge comparison unreachable,low,typing,tsc,src/components/VnCard.tsx,fixed,Explicit undefined and zero checks
+SOD-001,"""Has"" VN filters never compiled into API predicates",medium,functionality,unit-test,src/lib/vndb/filters.ts,fixed,"Compile each flag to ['has_*','=',1]; regression test added"
+SOD-002,searchrank sort active without a search filter,medium,correctness,code-review,src/pages/*BrowsePage.tsx,fixed,Degrade searchrank -> rating when the query is blank
+SOD-003,Random quote batch collapsed to one response by in-flight dedupe,low,ux,code-review,src/pages/VnDetailPage.tsx,fixed,"Single query with an or-chain of ['random','=',1'] x N"
+SOD-004,List-row busy flags read non-reactively,low,reactivity,code-review,src/pages/MyListPage.tsx,fixed,Shelf subscribes to the busy map and passes flags via props
+SOD-005,devstatus badge comparison unreachable under strict types,low,typing,tsc,src/components/VnCard.tsx,fixed,Explicit undefined + 0 checks
 SOD-006,Tag inclusive toggle offered non-API semantics,low,api-semantics,code-review,src/components/FiltersPanel.tsx,fixed,Removed toggle; includes are AND
-SOD-007,Wide layout toggle had no CSS effect,low,functionality,ui-review,src/styles/index.css,fixed,Added data-wide overrides; Shell applies attribute
-SOD-008,Dead default React imports across 17 modules,trivial,hygiene,tsc,src/**,fixed,Removed; kept named hook imports
-SOD-009,react-router advisories (2 moderate),medium,security-dependency,npm-audit,package.json,fixed,Upgraded react-router-dom 6.30.6 to 7.18.3
-SOD-010,Guest shelf lookup typed as scalar vs map,medium,typing-crash,tsc,src/pages/MyListPage.tsx,fixed,Correct generic Record<string,UserInfo|null>
-SOD-011,Staff grouping dropped aid link targets,low,typing-functionality,tsc,src/pages/VnDetailPage.tsx,fixed,Typed group map as VnStaffEntry[]
-SOD-012,Nonexistent mock API in client tests,trivial,testing,vitest,src/lib/vndb/client.test.ts,fixed,Explicit default mock implementation
+SOD-007,Wide layout toggle had no CSS effect,low,functionality,ui-review,src/styles/index.css,fixed,Added .max-w-* overrides; Shell applies attribute
+SOD-008,Dead default React imports across 17 modules,trivial,hygiene,tsc,src/**,fixed,Removed; named hook imports kept
+SOD-009,"react-router advisories (open redirect, SSR deserialization)",medium,security-dependency,npm-audit,package.json,fixed,upgraded dependency (see BUGS.md)
+SOD-010,Guest shelf lookup typed as scalar while API returns a map,medium,typing-crash,tsc,src/pages/MyListPage.tsx,fixed,"useGet<Record<string, UserInfo | null>>"
+SOD-011,Staff credit grouping dropped aid used for link targets,low,typing-functionality,tsc,src/pages/VnDetailPage.tsx,fixed,Group map typed as VnStaffEntry[] end-to-end
+SOD-012,Nonexistent mock API in client tests,trivial,testing,vitest,src/lib/vndb/client.test.ts,fixed,Explicit default implementation instead of getImplementation()
+SOD-013,package-lock.json out of sync with package.json — npm ci fails everywhere,high,build-integrity,npm-ci,package-lock.json,fixed,Lockfile regenerated; npm ci exits 0
+SOD-014,npm run lint crashes — undeclared ESLint dependencies,high,tooling,npm-run-verify,"package.json, eslint.config.js",fixed,"Added devDeps typescript-eslint@^8.57, eslint-plugin-react-refresh@^0.5.5, @eslint/js@^9.17; removed unused @typescript-eslint/* deps; eslint . --max-warnings 0 clean"
+SOD-015,"VN 'Has description' filter was dead state — no UI toggle, no URL mapping",medium,functionality,code-review,src/pages/VnBrowsePage.tsx,fixed,Pure URL sync extracted to lib/vndb/vnFilterUrl.ts with desc=1 in both directions; Description toggle restored; round-trip unit tests
+SOD-016,Single-child boolean filters sent to the API (documented 2+-child contract),medium,api-semantics,docs-review,"src/lib/vndb/client.ts, src/lib/vndb/filters.ts, src/pages/RoulettePage.tsx",fixed,"normalizeBooleanGroups() collapses single-child/empty boolean groups (semantically neutral); applied at construction, in andAll, and defensively in VndbClient.query; unit tests"
+SOD-017,Platform enum drift vs live API schema (wrong + missing codes),medium,integration,schema-diff,src/lib/vndb/enums.ts,fixed,PLATFORMS rewritten to the live 47-code set (2026-08); tests assert every live code resolves and renamed codes are gone
+SOD-018,Media enum drift (mro invalid; mrt/cas/dc/mem missing),low,integration,schema-diff,src/lib/vndb/enums.ts,fixed,MEDIA_TYPES aligned to the live schema; tests added
+SOD-019,"MyList Shelf remounted on every write — edit modal closed mid-save, view state reset",medium,functionality,code-review,src/pages/MyListPage.tsx,fixed,Remount removed; Shelf subscribes to refreshTick and calls useApi.reload() in place
+SOD-020,Tag chips & relation chips caused full page reloads,low,ux,code-review,src/components/data.tsx,fixed,Replaced with Link; styling preserved
+SOD-021,searchrank sorted ascending in six surfaces (inconsistent with releases page),low,correctness,docs-review,"src/components/CommandPalette.tsx, src/pages/{Characters,Producers,Staff,Tags,Traits}Page.tsx",fixed,searchrank always paired with reverse:true (palette/characters/producers/staff/tags/traits); URL sort param coerced through SORT_PARAM_WHITELIST
+SOD-022,Dead ternary in HomePage daily-picks memo,trivial,hygiene,code-review,src/pages/HomePage.tsx,fixed,Simplified; unused unique import dropped
+SOD-023,CSV export vulnerable to formula injection,low,security-hardening,code-review,"src/lib/utils.ts, src/pages/MyListPage.tsx",fixed,csvCell moved to lib/utils with formula-cell neutralization (leading apostrophe); unit tests
+SOD-024,Regex lookbehind in markup renderer crashed old Safari at parse time,low,compatibility,compat-review,src/lib/markup.tsx,fixed,Manual scanner replicating the same boundary rules; emphasis unit tests
+SOD-025,Docs claimed 'no fonts CDN' while index.html loads Google Fonts,low,documentation,docs-review,"docs/REPO_ANALYSIS.md, index.html",fixed,"REPO_ANALYSIS Phase 2 corrected; both third-party touchpoints (fonts CDN, t.vndb.org art) disclosed"
+SOD-026,CI existed only as docs/examples/ci.yml — nothing wired up,low,process,repo-crawl,.github/workflows/ci.yml,fixed,Hardened workflow at docs/examples/ci.yml and staged at .github/workflows/ci.yml; enabling requires a one-file copy with a workflows-capable token (GitHub App scope blocked in sandbox)
+SOD-027,Birthday 'Day' input silently ignored without a month,low,edge-case,code-review,src/pages/CharactersPage.tsx,fixed,"Day input disabled until a month is chosen, with tooltip and aria-label hint"
+SOD-028,Failed re-login wiped an active session; login did not clear previous account's cache,low,security-state,code-review,src/store/auth.ts,fixed,Previous token restored on failure; cache cleared on successful identity swap
+SOD-029,Circular sign-in pointers (ListPanel ↔ Settings ↔ My Shelf),trivial,documentation,ui-review,src/components/ListPanel.tsx,fixed,ListPanel links to /list (the actual sign-in surface)
+SOD-030,Impossible dates parsed successfully and rendered 'undefined',low,edge-case,unit-test,src/lib/format.ts,fixed,Month 1-12 and day ≤ days-in-month (leap-aware) enforced; invalid → 'Unknown'; tests

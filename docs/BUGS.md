@@ -109,3 +109,168 @@ Severity legend: **critical** (security/data loss) > **high** (broken core flow)
 
 *Registry closed for this release. New findings must open a new `SOD-###` row here, in
 `bugs.json`, and in `bugs.csv` before the fix is merged.*
+
+---
+
+# Second audit pass — 2026-08-29 (this branch)
+
+A fresh full-repository sweep, re-validated line-by-line against the live kana documentation
+(<https://api.vndb.org/kana>) and schema (<https://api.vndb.org/kana/schema>). All findings
+below are fixed on `arena/01a04ef3-vndb-client-web` with unit coverage unless marked
+otherwise. Machine-readable companions: [`bugs.json`](./bugs.json), [`bugs.csv`](./bugs.csv).
+
+## SOD-013 — Lockfile drift broke `npm ci` everywhere (high) — FIXED
+
+- **Found by:** `npm ci` (EUSAGE) on a clean checkout.
+- **Symptom:** clean installs aborted — the lockfile pinned `@vitejs/plugin-react@4.7.0`,
+  `typescript@5.6.3`, `zustand@5.x`, … which no longer satisfied `package.json`. README
+  quick start, Netlify/Vercel builds and the CI example were all broken.
+- **Root cause:** dependencies were bumped in `package.json` without running `npm install`.
+- **Fix:** lockfile regenerated; `npm ci` exits 0. CI (SOD-026) runs `npm ci` as a drift guard.
+- **Prevention:** CI always installs with `npm ci`, never `npm install`.
+
+## SOD-014 — `npm run lint` crashed on undeclared ESLint deps (high) — FIXED
+
+- **Found by:** `npm run verify`.
+- **Symptom:** `ERR_MODULE_NOT_FOUND: typescript-eslint`; the lint gate (and therefore
+  `verify` and CI) could not run at all.
+- **Root cause:** `eslint.config.js` imports `typescript-eslint` and
+  `eslint-plugin-react-refresh` — neither was in `package.json`; `@eslint/js` was imported
+  directly but only present transitively; `@typescript-eslint/eslint-plugin|parser` were
+  declared but unused.
+- **Fix:** devDeps added (`typescript-eslint@^8.57`, `eslint-plugin-react-refresh@^0.5.5`,
+  `@eslint/js@^9.17`), unused `@typescript-eslint/*` removed. `eslint . --max-warnings 0` clean.
+
+## SOD-015 — "Has description" filter was dead state (medium) — FIXED
+
+- **Found by:** code review against SOD-001's prevention rule ("every `FilterState` field
+  must appear in the compiler test matrix").
+- **Symptom:** `hasDescription` existed in the state type and in `buildVnFilter`, but the
+  URL sync never read or wrote it and the panel had no toggle — unreachable dead code.
+- **Fix:** URL (de)serialization extracted to `lib/vndb/vnFilterUrl.ts` (`desc=1` both
+  directions) and the *Description* toggle restored; round-trip tests.
+
+## SOD-016 — Single-child boolean filters could reach the API (medium) — FIXED
+
+- **Found by:** docs review — kana defines `and`/`or` as *"followed by two or more other
+  predicates"*.
+- **Symptom:** the roulette with all dials cleared posted `["and",["id",">=",…]]` (one
+  child); `F.and(pred)` / `F.or(pred)` with one argument — e.g. a single language or trait
+  chip — produced the same shape anywhere downstream code did not unwrap it.
+- **Fix:** `normalizeBooleanGroups()` (single-child unwrap, empty-group drop, recursive) is
+  applied at `F.and`/`F.or` construction, inside `andAll`, and defensively in
+  `VndbClient.query`. The rewrites are semantically neutral, so this is safe regardless of
+  server tolerance. Unit-tested.
+
+## SOD-017 — Platform enum drift vs live schema (medium) — FIXED
+
+- **Found by:** diff against `GET /schema` (2026-08).
+- **Symptom:** the app mapped codes the API does not use (`snes`, `dc`, `3ds`, `xsx`) and
+  missed live ones (`ps1`, `sfc`, `drc`, `n3d`, `xxs`, `wiu`, `sw2`, `tdo`, `msx`, `smd`,
+  `scd`, `pcf`, `p88`, `fm7`, `fm8`, `x1s`, `xb1`). Badges degraded to raw codes; the
+  Releases "Xbox Series X/S" chip posted `platform=xsx`, which the API rejects.
+- **Fix:** `PLATFORMS` rewritten from the live 47-code enum; tests lock every live code to a
+  label and assert the dead codes are gone.
+
+## SOD-018 — Media enum drift (low) — FIXED
+
+- Same method as SOD-017: `mro` is not in the live enum; `mrt`/`cas`/`dc`/`mem` were
+  missing. `MEDIA_TYPES` aligned and tested.
+
+## SOD-019 — Shelf remount closed the edit modal mid-save (medium) — FIXED
+
+- **Found by:** code review of `MyListPage` + `useUlist`.
+- **Symptom:** saving labels+vote+dates+notes closed the modal after the first successful
+  PATCH (the rest still applied, silently); sort/page/label/search reset on every write.
+- **Root cause:** `<Shelf key={`${user.id}:${refreshTick}`}>` remounted the whole subtree
+  on every `bump()` — and `guard()` bumps once per sub-write.
+- **Fix:** remount removed; the Shelf subscribes to `refreshTick` and calls `useApi.reload()`
+  in place. State survives; the modal stays open until the save completes.
+
+## SOD-020 — Tag/relation chips triggered full page reloads (low) — FIXED
+
+- `TagList` and `RelationChips` emitted raw `<a href="/g/…">`; replaced with react-router
+  `<Link>` so navigation stays client-side.
+
+## SOD-021 — `searchrank` sorted ascending in six surfaces (low) — FIXED
+
+- **Found by:** docs review — *reverse: set to true to sort in descending order* implies an
+  ascending default, and the codebase was split (releases page `reverse:true`, palette,
+  characters, producers, staff, tags, traits `reverse:false`). At most one could be right.
+- **Fix:** relevance sorts now consistently request descending (`reverse:true`); the `/v`
+  `sort` URL param is coerced through `SORT_PARAM_WHITELIST` so junk deep links fall back to
+  the default sort instead of a 400 error state.
+
+## SOD-022 — Dead ternary in HomePage memo (trivial) — FIXED
+
+- `unique(...).length === out.length ? out : out` simplified; unused import dropped.
+
+## SOD-023 — CSV formula injection in shelf export (low) — FIXED
+
+- **Symptom:** `csvCell` quoted delimiters but a cell beginning with `= + - @` or a tab was
+  written verbatim — OWASP CSV-injection territory when the export is opened in a
+  spreadsheet app.
+- **Fix:** `csvCell` moved to `lib/utils.ts`, hardening added (leading `'` prefix); tests.
+
+## SOD-024 — Regex lookbehind could crash the whole bundle on older browsers (low) — FIXED
+
+- **Symptom:** `renderTextWithEmphasis` used `(?<![\w/])` — regex lookbehind is a
+  *parse-time* SyntaxError on Safari < 16.4 / Firefox < 78, far below the es2020 build
+  target: one white screen, no app at all.
+- **Fix:** hand-rolled scanner with the same matching rules; emphasis tests added.
+
+## SOD-025 — Docs vs reality: fonts CDN (low) — FIXED
+
+- `docs/REPO_ANALYSIS.md` claimed "no fonts CDN (fonts are stack-native)" while
+  `index.html` loads Google Fonts. Phase 2 of the analysis now discloses both third-party
+  touchpoints (fonts CDN and `t.vndb.org` art hotlinking).
+
+## SOD-026 — CI was an example, not a pipeline (low) — FIXED (needs one manual step to enable)
+
+- The hardened workflow lives in [`docs/examples/ci.yml`](./examples/ci.yml) and is also
+  staged ready-to-commit at `.github/workflows/ci.yml` in this working tree. Pushing
+  workflow files from this sandbox is refused (the GitHub App token lacks the `workflows`
+  scope), so enabling CI is a one-liner for a maintainer:
+  `mkdir -p .github/workflows && cp docs/examples/ci.yml .github/workflows/ci.yml`.
+  The pipeline runs the documented gates (`npm ci` → `tsc` → `eslint --max-warnings 0` →
+  `vitest` → `vite build` → `npm audit --omit=dev`).
+
+## SOD-027 — Birthday day-input silently ignored without a month (low) — FIXED
+
+- The characters page let users type a day with no month; `buildCharacterFilter` drops the
+  value. The day field is now disabled until a month is selected.
+
+## SOD-028 — Failed re-login wiped an active session (low) — FIXED
+
+- `auth.login` failure called `vndb.setToken(null)` even when a valid user was signed in
+  (silent deauth + store/client mismatch), and a successful identity switch kept the
+  previous account's cached reads. The previous token is now restored on failure and the
+  cache is cleared on success.
+
+## SOD-029 — Circular sign-in pointers (trivial) — FIXED
+
+- ListPanel pointed guests at `/settings`, which points back to `/list`. ListPanel now
+  links to `/list`, the actual sign-in surface.
+
+## SOD-030 — Impossible dates rendered "undefined" (low) — FIXED
+
+- `parseVndbDate` accepted `2022-13-05` / `2022-02-31` (shape-only regex); month/day ranges
+  are now calendar-validated (leap-aware) and invalid input degrades to `Unknown`.
+
+---
+
+## Post-fix audit snapshot (second pass)
+
+| Check | Result |
+| --- | --- |
+| `npm ci` | exits 0 (SOD-013) |
+| `tsc --noEmit` | clean (strict) |
+| `eslint . --max-warnings 0` | clean (SOD-014) |
+| `vitest run` | 106 / 106 passing (71 original + 35 new) |
+| `vite build` | clean |
+| `npm audit --omit=dev` | 0 vulnerabilities |
+
+*Verification of API contracts in this pass used the published kana documentation and
+`GET /schema` (2026-08-29). Live POST probes are not possible from the audit sandbox
+(egress to api.vndb.org is TLS-filtered); every behavioral claim above cites the
+documentation it was checked against.*
