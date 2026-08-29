@@ -1,8 +1,14 @@
 {
   "project": "sakura-odyssey (anonsann/vndb-client-web)",
-  "branch": "arena/01a04d66-vndb-client-web",
+  "branch": "arena/01a04ef3-vndb-client-web",
   "generated": "2026-08-29",
-  "severityScale": ["critical", "high", "medium", "low", "trivial"],
+  "severityScale": [
+    "critical",
+    "high",
+    "medium",
+    "low",
+    "trivial"
+  ],
   "bugs": [
     {
       "id": "SOD-001",
@@ -95,7 +101,10 @@
       "class": "security-dependency",
       "foundBy": "npm-audit",
       "area": "package.json",
-      "advisories": ["GHSA-wrjc-x8rr-h8h6", "GHSA-337j-9hxr-rhxg"],
+      "advisories": [
+        "GHSA-wrjc-x8rr-h8h6",
+        "GHSA-337j-9hxr-rhxg"
+      ],
       "fixVersion": "react-router-dom@7.18.3"
     },
     {
@@ -124,6 +133,200 @@
       "foundBy": "vitest",
       "area": "src/lib/vndb/client.test.ts",
       "resolution": "Explicit default implementation instead of getImplementation()"
+    },
+    {
+      "id": "SOD-013",
+      "title": "package-lock.json out of sync with package.json — npm ci fails everywhere",
+      "severity": "high",
+      "class": "build-integrity",
+      "foundBy": "npm-ci",
+      "area": "package-lock.json",
+      "symptom": "npm ci aborts (EUSAGE): lockfile pins (@vitejs/plugin-react@4.7.0, typescript@5.6.3, zustand@5.x) do not satisfy package.json; README quick start, Netlify/Vercel builds and CI all break",
+      "rootCause": "Dependencies bumped in package.json without re-running npm install",
+      "resolution": "Lockfile regenerated; npm ci exits 0"
+    },
+    {
+      "id": "SOD-014",
+      "title": "npm run lint crashes — undeclared ESLint dependencies",
+      "severity": "high",
+      "class": "tooling",
+      "foundBy": "npm-run-verify",
+      "area": "package.json, eslint.config.js",
+      "symptom": "eslint exits ERR_MODULE_NOT_FOUND for typescript-eslint; npm run verify and the CI lint gate unusable",
+      "rootCause": "eslint.config.js imports typescript-eslint and eslint-plugin-react-refresh, neither declared; @eslint/js used directly but only transitive; @typescript-eslint plugin+parser declared but unused",
+      "resolution": "Added devDeps typescript-eslint@^8.57, eslint-plugin-react-refresh@^0.5.5, @eslint/js@^9.17; removed unused @typescript-eslint/* deps; eslint . --max-warnings 0 clean"
+    },
+    {
+      "id": "SOD-015",
+      "title": "VN 'Has description' filter was dead state — no UI toggle, no URL mapping",
+      "severity": "medium",
+      "class": "functionality",
+      "foundBy": "code-review",
+      "area": "src/pages/VnBrowsePage.tsx",
+      "symptom": "hasDescription existed in VnFilterState and buildVnFilter but was unreachable: readState/writeState dropped it and the panel had no toggle (regression against SOD-001 prevention rule)",
+      "rootCause": "Toggle and URL param removed during UI rework while the state field stayed",
+      "resolution": "Pure URL sync extracted to lib/vndb/vnFilterUrl.ts with desc=1 in both directions; Description toggle restored; round-trip unit tests"
+    },
+    {
+      "id": "SOD-016",
+      "title": "Single-child boolean filters sent to the API (documented 2+-child contract)",
+      "severity": "medium",
+      "class": "api-semantics",
+      "foundBy": "docs-review",
+      "area": "src/lib/vndb/client.ts, src/lib/vndb/filters.ts, src/pages/RoulettePage.tsx",
+      "symptom": "With all roulette constraints cleared the spin posts [\"and\",[\"id\",\">=\",…]] — one child; F.and()/F.or() with a single argument and single language/trait selections produce the same shape; kana documents and/or as 'followed by two or more other predicates'",
+      "rootCause": "No normalization pass between filter builders and the transport layer",
+      "resolution": "normalizeBooleanGroups() collapses single-child/empty boolean groups (semantically neutral); applied at construction, in andAll, and defensively in VndbClient.query; unit tests"
+    },
+    {
+      "id": "SOD-017",
+      "title": "Platform enum drift vs live API schema (wrong + missing codes)",
+      "severity": "medium",
+      "class": "integration",
+      "foundBy": "schema-diff",
+      "area": "src/lib/vndb/enums.ts",
+      "symptom": "Map carried codes the schema does not have (snes, dc, 3ds, xsx) and missed live ones (ps1, sfc, drc, n3d, xxs, wiu, sw2, tdo, msx, smd, scd, pcf, p88, fm7, fm8, x1s, xb1); badges fell back to raw codes; the Releases Xbox Series X/S chip posted platform=xsx which the API rejects",
+      "rootCause": "Enum hand-curated from memory, never re-validated against GET /schema",
+      "resolution": "PLATFORMS rewritten to the live 47-code set (2026-08); tests assert every live code resolves and renamed codes are gone"
+    },
+    {
+      "id": "SOD-018",
+      "title": "Media enum drift (mro invalid; mrt/cas/dc/mem missing)",
+      "severity": "low",
+      "class": "integration",
+      "foundBy": "schema-diff",
+      "area": "src/lib/vndb/enums.ts",
+      "symptom": "mediaTypeName fell back to raw codes for live media values; mro is not in the live enum",
+      "resolution": "MEDIA_TYPES aligned to the live schema; tests added"
+    },
+    {
+      "id": "SOD-019",
+      "title": "MyList Shelf remounted on every write — edit modal closed mid-save, view state reset",
+      "severity": "medium",
+      "class": "functionality",
+      "foundBy": "code-review",
+      "area": "src/pages/MyListPage.tsx",
+      "symptom": "Editing labels+vote+dates+notes closed the modal after the first successful PATCH; sort/page/label/search state reset after every write",
+      "rootCause": "Shelf keyed by user.id:refreshTick and ulist.bump() fires per successful guard; key-remount was the refetch mechanism",
+      "resolution": "Remount removed; Shelf subscribes to refreshTick and calls useApi.reload() in place"
+    },
+    {
+      "id": "SOD-020",
+      "title": "Tag chips & relation chips caused full page reloads",
+      "severity": "low",
+      "class": "ux",
+      "foundBy": "code-review",
+      "area": "src/components/data.tsx",
+      "symptom": "TagList and RelationChips rendered raw <a href=\"/g/…\"> anchors — browser document reloads instead of SPA navigation",
+      "rootCause": "react-router Link not used in the chip renderers",
+      "resolution": "Replaced with Link; styling preserved"
+    },
+    {
+      "id": "SOD-021",
+      "title": "searchrank sorted ascending in six surfaces (inconsistent with releases page)",
+      "severity": "low",
+      "class": "correctness",
+      "foundBy": "docs-review",
+      "area": "src/components/CommandPalette.tsx, src/pages/{Characters,Producers,Staff,Tags,Traits}Page.tsx",
+      "symptom": "reverse:false with sort=searchrank is worst-match-first under the documented 'reverse=true sorts descending' rule; ReleasesBrowsePage used reverse:true — at most one could be right; additionally /v?sort=<junk> reached the API unvalidated",
+      "rootCause": "Default sort direction assumed per-field rather than the documented ascending default",
+      "resolution": "searchrank always paired with reverse:true (palette/characters/producers/staff/tags/traits); URL sort param coerced through SORT_PARAM_WHITELIST"
+    },
+    {
+      "id": "SOD-022",
+      "title": "Dead ternary in HomePage daily-picks memo",
+      "severity": "trivial",
+      "class": "hygiene",
+      "foundBy": "code-review",
+      "area": "src/pages/HomePage.tsx",
+      "symptom": "unique(out.map(v=>v.id)).length === out.length ? out : out — both branches identical",
+      "rootCause": "Leftover of an earlier dedupe attempt",
+      "resolution": "Simplified; unused unique import dropped"
+    },
+    {
+      "id": "SOD-023",
+      "title": "CSV export vulnerable to formula injection",
+      "severity": "low",
+      "class": "security-hardening",
+      "foundBy": "code-review",
+      "area": "src/lib/utils.ts, src/pages/MyListPage.tsx",
+      "symptom": "Shelf CSV export quoted delimiters but not leading =,+,-,@ or tab; notes/titles opened in Excel/LibreOffice/Sheets could execute as formulas (OWASP CSV injection)",
+      "rootCause": "Escaping covered delimiters only",
+      "resolution": "csvCell moved to lib/utils with formula-cell neutralization (leading apostrophe); unit tests"
+    },
+    {
+      "id": "SOD-024",
+      "title": "Regex lookbehind in markup renderer crashed old Safari at parse time",
+      "severity": "low",
+      "class": "compatibility",
+      "foundBy": "compat-review",
+      "area": "src/lib/markup.tsx",
+      "symptom": "renderTextWithEmphasis used (?<![\\w/]) — a SyntaxError at script parse on Safari <16.4 / Firefox <78, taking down the whole bundle despite the es2020 build target",
+      "rootCause": "Lookbehind assumed universally supported",
+      "resolution": "Manual scanner replicating the same boundary rules; emphasis unit tests"
+    },
+    {
+      "id": "SOD-025",
+      "title": "Docs claimed 'no fonts CDN' while index.html loads Google Fonts",
+      "severity": "low",
+      "class": "documentation",
+      "foundBy": "docs-review",
+      "area": "docs/REPO_ANALYSIS.md, index.html",
+      "symptom": "External-effects scan contradicted the shipped index.html (Google Fonts: Cinzel/Inter/Shippori Mincho B1/JetBrains Mono/Source Serif 4)",
+      "resolution": "REPO_ANALYSIS Phase 2 corrected; both third-party touchpoints (fonts CDN, t.vndb.org art) disclosed"
+    },
+    {
+      "id": "SOD-026",
+      "title": "CI existed only as docs/examples/ci.yml — nothing wired up",
+      "severity": "low",
+      "class": "process",
+      "foundBy": "repo-crawl",
+      "area": ".github/workflows/ci.yml",
+      "symptom": "No .github/workflows directory; the quality gates (tsc, eslint --max-warnings 0, vitest, build, audit) never ran on push/PR",
+      "resolution": "Hardened workflow at docs/examples/ci.yml and staged at .github/workflows/ci.yml; enabling requires a one-file copy with a workflows-capable token (GitHub App scope blocked in sandbox)"
+    },
+    {
+      "id": "SOD-027",
+      "title": "Birthday 'Day' input silently ignored without a month",
+      "severity": "low",
+      "class": "edge-case",
+      "foundBy": "code-review",
+      "area": "src/pages/CharactersPage.tsx",
+      "symptom": "Day typed with no month selected was dropped by buildCharacterFilter (birthday filter requires the month)",
+      "rootCause": "Day input not coupled to month selection",
+      "resolution": "Day input disabled until a month is chosen, with tooltip and aria-label hint"
+    },
+    {
+      "id": "SOD-028",
+      "title": "Failed re-login wiped an active session; login did not clear previous account's cache",
+      "severity": "low",
+      "class": "security-state",
+      "foundBy": "code-review",
+      "area": "src/store/auth.ts",
+      "symptom": "auth.login failure called vndb.setToken(null) even when a valid user was signed in (silent deauth, store/client token mismatch); switching accounts kept the prior account's cached reads",
+      "rootCause": "Login failure path assumed no prior session",
+      "resolution": "Previous token restored on failure; cache cleared on successful identity swap"
+    },
+    {
+      "id": "SOD-029",
+      "title": "Circular sign-in pointers (ListPanel ↔ Settings ↔ My Shelf)",
+      "severity": "trivial",
+      "class": "documentation",
+      "foundBy": "ui-review",
+      "area": "src/components/ListPanel.tsx",
+      "symptom": "ListPanel sent guests to /settings to sign in, but Settings says to sign in from /list",
+      "resolution": "ListPanel links to /list (the actual sign-in surface)"
+    },
+    {
+      "id": "SOD-030",
+      "title": "Impossible dates parsed successfully and rendered 'undefined'",
+      "severity": "low",
+      "class": "edge-case",
+      "foundBy": "unit-test",
+      "area": "src/lib/format.ts",
+      "symptom": "parseVndbDate accepted 2022-13-05 / 2022-02-31 → MONTHS[12] undefined in formatVndbDate",
+      "rootCause": "Regex validated shape only, not calendar ranges",
+      "resolution": "Month 1-12 and day ≤ days-in-month (leap-aware) enforced; invalid → 'Unknown'; tests"
     }
   ],
   "postFixAudit": {
@@ -132,5 +335,6 @@
     "vitest": "71/71 passing",
     "viteBuild": "clean, 31 chunks",
     "npmAuditProduction": "0 vulnerabilities"
-  }
+  },
+  "audit": "Second full-pass audit. Verified against live kana docs (api.vndb.org/kana) and schema (api.vndb.org/kana/schema) on 2026-08-29."
 }

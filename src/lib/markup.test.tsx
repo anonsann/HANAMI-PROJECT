@@ -51,3 +51,18 @@ describe('renderDescription safety', () => {
     expect(shown).toContain('secret');
   });
 });
+
+describe('emphasis rendering without regex lookbehind (SOD-024)', () => {
+  it('renders *bold* tokens', () => {
+    const html = renderToStaticMarkup(<>{renderDescription('this is *important* stuff', 0)}</>);
+    expect(html).toContain('<strong>important</strong>');
+  });
+  it('renders /italic/ tokens at word boundaries', () => {
+    const html = renderToStaticMarkup(<>{renderDescription('a /whisper/ in the dark', 0)}</>);
+    expect(html).toContain('<em>whisper</em>');
+  });
+  it('does not mangle paths or slash abbreviations', () => {
+    const html = renderToStaticMarkup(<>{renderDescription('see https://example.com/a/b and w/', 0)}</>);
+    expect(html).not.toContain('<em>');
+  });
+});

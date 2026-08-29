@@ -28,7 +28,7 @@ export default function TraitsPage() {
       filters: debounced.trim() ? ['search', '=', debounced.trim()] : [],
       fields: TRAIT_CARD,
       sort: sortChars ? 'char_count' : debounced.trim() ? 'searchrank' : 'name',
-      reverse: sortChars,
+      reverse: sortChars || !!debounced.trim(), // SOD-021: char_count & searchrank are desc-worthy
       results: PAGE_SIZE,
       page,
       count: page === 1

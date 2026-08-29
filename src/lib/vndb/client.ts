@@ -13,6 +13,7 @@
 
 import type { ApiResponse, Endpoint, QueryBody } from './types';
 import { joinUrl, sleep } from '../utils';
+import { normalizeBooleanGroups } from './filters';
 
 export type ApiErrorKind = 'http' | 'network' | 'timeout' | 'parse' | 'aborted';
 
@@ -351,6 +352,12 @@ export class VndbClient {
     opts: { ttlMs?: number; label?: string; signal?: AbortSignal } = {}
   ): Promise<ApiResponse<T>> {
     const safeBody: QueryBody = { ...body };
+    // SOD-016: collapse single-child/empty boolean groups — the kana contract
+    // defines and/or as taking "two or more" predicates, and the rewrite is
+    // always semantically neutral.
+    if (safeBody.filters !== undefined && safeBody.filters !== null) {
+      safeBody.filters = normalizeBooleanGroups(safeBody.filters);
+    }
     if (safeBody.results !== undefined) {
       safeBody.results = Math.max(0, Math.min(100, Math.floor(safeBody.results)));
     }

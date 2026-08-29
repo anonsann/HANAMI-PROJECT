@@ -350,6 +350,7 @@ export function VnFiltersPanel({
           <div className="flex flex-col gap-2">
             <Toggle checked={state.hasAnime} onChange={(v) => set({ hasAnime: v })} label="Anime adaptation" />
             <Toggle checked={state.hasScreenshot} onChange={(v) => set({ hasScreenshot: v })} label="Screenshots" />
+            <Toggle checked={state.hasDescription} onChange={(v) => set({ hasDescription: v })} label="Description" />
             <Toggle checked={state.hasReview} onChange={(v) => set({ hasReview: v })} label="Reviews" />
           </div>
         </div>

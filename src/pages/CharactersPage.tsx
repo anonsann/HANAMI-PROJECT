@@ -42,7 +42,7 @@ export default function CharactersPage() {
       filters: filter ?? [],
       fields: CHARACTER_CARD,
       sort: debouncedSearch.trim() ? 'searchrank' : 'id',
-      reverse: false,
+      reverse: !!debouncedSearch.trim(), // SOD-021: searchrank desc; id asc
       results: PAGE_SIZE,
       page,
       count: page === 1
@@ -94,7 +94,7 @@ export default function CharactersPage() {
         <Field label="Birthday">
           <div className="flex items-center gap-2">
             <Select ariaLabel="Birth month" className="flex-1" value={state.month === null ? '' : String(state.month)} onChange={(v) => set({ month: v === '' ? null : Number(v) })} options={[{ value: '', label: 'Any month' }, ...MONTHS.map((m, i) => ({ value: String(i + 1), label: m }))]} />
-            <input className="input w-24" type="number" min={1} max={31} placeholder="Day" value={state.day ?? ''} onChange={(e) => set({ day: e.target.value ? Number(e.target.value) : null })} aria-label="Birth day" />
+            <input className="input w-24" type="number" min={1} max={31} placeholder="Day" value={state.day ?? ''} disabled={state.month === null} title={state.month === null ? 'Pick a month first' : undefined} onChange={(e) => set({ day: e.target.value ? Number(e.target.value) : null })} aria-label="Birth day (pick a month first)" />
           </div>
         </Field>
         <div className="sm:col-span-2">

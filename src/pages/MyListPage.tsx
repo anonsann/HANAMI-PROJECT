@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { vndb } from '../lib/vndb/client';
 import { useApi, useGet } from '../lib/vndb/resource';
@@ -6,7 +6,7 @@ import { ULIST_ITEM } from '../lib/vndb/fields';
 import type { UlistItem, UlistLabel, UserInfo } from '../lib/vndb/types';
 import { BUILTIN_LABELS, rlistStatusName } from '../lib/vndb/enums';
 import { formatRating, formatVote, formatTimestamp, formatVndbDate } from '../lib/format';
-import { squeeze } from '../lib/utils';
+import { squeeze, csvCell } from '../lib/utils';
 import { useTitle, useDebouncedValue } from '../hooks';
 import { useAuth } from '../store/auth';
 import { useUlist } from '../store/ulist';
@@ -33,7 +33,6 @@ const LIST_SORTS = [
 export default function MyListPage() {
   useTitle('My Shelf');
   const user = useAuth((s) => s.user);
-  const refreshTick = useUlist((s) => s.refreshTick);
   const [params, setParams] = useSearchParams();
   const guestUser = params.get('user');
 
@@ -44,7 +43,7 @@ export default function MyListPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      {user ? <Shelf key={`${user.id}:${refreshTick}`} userId={user.id} username={user.username} pathname="mine" /> : <ShelfGate />}
+      {user ? <Shelf userId={user.id} username={user.username} pathname="mine" /> : <ShelfGate />}
 
       <BookmarksSection />
     </div>
@@ -210,6 +209,13 @@ function Shelf({ userId, username, pathname }: { userId: string; username: strin
   );
 
   const res = useApi<UlistItem>('ulist', body, { label: 'ulist', ttlMs: 15_000 });
+  // SOD-019: refetch in place after writes instead of remounting the whole
+  // shelf (which used to close the edit modal mid-save and reset sort/page).
+  const refreshTick = useUlist((s) => s.refreshTick);
+  useEffect(() => {
+    if (refreshTick > 0) res.reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTick]);
   const count = res.data?.count;
   const totalPages = count !== undefined ? Math.max(1, Math.ceil(count / pageSize)) : page + (res.data?.more ? 1 : 0);
 
@@ -532,7 +538,3 @@ function BookmarksSection() {
   );
 }
 
-function csvCell(s: string): string {
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
-}

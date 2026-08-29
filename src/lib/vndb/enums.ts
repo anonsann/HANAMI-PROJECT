@@ -54,43 +54,61 @@ export function languageName(code: string): string {
   return LANGUAGES[code] ?? code;
 }
 
+/**
+ * Platform codes mirrored from GET /schema (api.vndb.org), verified 2026-08.
+ * SOD-017: earlier revisions shipped codes the API has since renamed or never
+ * used (`snes`→`sfc`, `dc`→`drc`, `3ds`→`n3d`, `xsx`→`xxs`), which produced raw
+ * code badges and 400s when used as filter values. Keep this list in sync with
+ * the schema; unknown codes still fall back to the raw value via platformName.
+ */
 export const PLATFORMS: Record<string, string> = {
   win: 'Windows',
   lin: 'Linux',
-  mac: 'macOS',
+  mac: 'Mac OS',
   web: 'Website',
+  tdo: '3DO',
   ios: 'iOS',
   and: 'Android',
-  mob: 'Other mobile',
+  bdp: 'Blu-ray Player',
+  dos: 'DOS',
+  dvd: 'DVD Player',
+  drc: 'Dreamcast',
+  nes: 'Famicom (NES)',
+  sfc: 'Super Famicom (SNES)',
+  fm7: 'FM-7',
+  fm8: 'FM-8',
+  fmt: 'FM Towns',
+  gba: 'Game Boy Advance',
+  gbc: 'Game Boy Color',
+  msx: 'MSX',
+  nds: 'Nintendo DS',
+  swi: 'Nintendo Switch',
+  sw2: 'Nintendo Switch 2',
+  wii: 'Nintendo Wii',
+  wiu: 'Nintendo Wii U',
+  n3d: 'Nintendo 3DS',
+  p88: 'PC-88',
+  p98: 'PC-98',
+  pce: 'PC Engine',
+  pcf: 'PC-FX',
   psp: 'PlayStation Portable',
-  psv: 'PlayStation Vita',
+  ps1: 'PlayStation 1',
   ps2: 'PlayStation 2',
   ps3: 'PlayStation 3',
   ps4: 'PlayStation 4',
   ps5: 'PlayStation 5',
+  psv: 'PlayStation Vita',
+  smd: 'Sega Mega Drive',
+  scd: 'Sega Mega-CD',
+  sat: 'Sega Saturn',
+  vnd: 'VNDS',
+  x1s: 'Sharp X1',
+  x68: 'Sharp X68000',
+  xb1: 'Xbox',
   xb3: 'Xbox 360',
   xbo: 'Xbox One',
-  xsx: 'Xbox Series X/S',
-  nds: 'Nintendo DS',
-  '3ds': 'Nintendo 3DS',
-  swi: 'Nintendo Switch',
-  wii: 'Wii',
-  nes: 'NES',
-  snes: 'SNES',
-  n64: 'Nintendo 64',
-  gba: 'Game Boy Advance',
-  gbc: 'Game Boy Color',
-  sat: 'Sega Saturn',
-  dc: 'Dreamcast',
-  dvd: 'DVD Player',
-  bdp: 'Blu-ray Player',
-  dos: 'DOS',
-  fmt: 'FM Towns',
-  x68: 'X68000',
-  pce: 'PC Engine',
-  'pc-98': 'PC-98',
-  cas: 'Casio Loopy',
-  vnd: 'VNDS',
+  xxs: 'Xbox Series X/S',
+  mob: 'Other (mobile)',
   oth: 'Other'
 };
 
@@ -124,10 +142,11 @@ export const STAFF_ROLES: Record<string, string> = {
   director: 'Director',
   chardesign: 'Character Design',
   art: 'Artist',
-  music: 'Music',
+  music: 'Composer',
   songs: 'Vocals',
   translator: 'Translator',
   editor: 'Editor',
+  qa: 'Quality assurance',
   staff: 'Staff'
 };
 
@@ -196,18 +215,21 @@ export function voicedLabel(v: number | null | undefined): string {
   return VOICED[v] ?? 'Unknown';
 }
 
-/** Release media types (subset; falls back to raw code). */
+/** Release media types — codes mirrored from GET /schema (SOD-018). */
 export const MEDIA_TYPES: Record<string, string> = {
   in: 'Internet download',
+  dc: 'Download card',
   cd: 'CD',
   dvd: 'DVD',
   gdr: 'GD-ROM',
-  blr: 'Blu-ray',
+  blr: 'Blu-ray disc',
   flp: 'Floppy',
-  mro: 'Memory card',
+  mrt: 'Cartridge',
+  cas: 'Cassette tape',
+  mem: 'Memory card',
   umd: 'UMD',
   nod: 'Nintendo Optical Disc',
-  otc: 'Other console cartridge',
+  otc: 'Other',
   ot: 'Other media'
 };
 

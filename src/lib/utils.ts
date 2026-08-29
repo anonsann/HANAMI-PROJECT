@@ -43,6 +43,22 @@ export function squeeze(s: string): string {
   return s.replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * CSV field escaping with formula-injection hardening (SOD-023).
+ *
+ * Beyond quoting commas/quotes/newlines, a leading `= + - @` or tab/CR is
+ * prefixed with `'` so spreadsheet applications treat the cell as text rather
+ * than a formula (OWASP "CSV Injection" guidance).
+ */
+export function csvCell(s: string): string {
+  const needsQuote = /[",\n\r]/.test(s);
+  const dangerous = /^[=+\-@\t\r]/.test(s);
+  let out = s;
+  if (dangerous) out = `'${out}`;
+  if (needsQuote) out = `"${out.replace(/"/g, '""')}"`;
+  return out;
+}
+
 /** Very small seeded PRNG (mulberry32) for deterministic shuffles. */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;

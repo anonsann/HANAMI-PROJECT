@@ -22,8 +22,16 @@ export function parseVndbDate(s: string | null | undefined): ParsedDate {
   const year = Number(m[1]);
   if (m[2] === undefined) return { kind: 'year', year };
   const month = Number(m[2]);
+  // SOD-030: guard impossible months/days so callers never render "undefined".
+  if (month < 1 || month > 12) return { kind: 'unknown' };
   if (m[3] === undefined) return { kind: 'month', year, month };
-  return { kind: 'exact', year, month, day: Number(m[3]) };
+  const day = Number(m[3]);
+  if (day < 1 || day > daysInMonth(year, month)) return { kind: 'unknown' };
+  return { kind: 'exact', year, month, day };
+}
+
+function daysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
 }
 
 export function formatVndbDate(s: string | null | undefined): string {

@@ -102,18 +102,55 @@ export function renderDescription(
   });
 }
 
-/** Minimal emphasis: *italic* and _italic_ tokens (cosmetic, safe). */
+/**
+ * Minimal emphasis: *bold* and /italic/ spans (cosmetic, safe).
+ *
+ * SOD-024: implemented as a manual scan instead of a regex with lookbehind —
+ * lookbehind is a SyntaxError at parse time on Safari < 16.4 and Firefox < 78,
+ * which would take down the entire bundle the moment this module is parsed,
+ * well below the es2020 build target.
+ */
 function renderTextWithEmphasis(text: string, keyPrefix: string): React.ReactNode {
-  const re = /(\*[^*\n]{1,200}\*|(?<![\w/])\/[^/\n]{1,200}\/(?![\w/]))/g;
-  const chunks = text.split(re);
-  if (chunks.length === 1) return text;
-  return chunks.map((c, i) => {
-    if (c.length > 2 && c.startsWith('*') && c.endsWith('*'))
-      return <strong key={`${keyPrefix}-${i}`}>{c.slice(1, -1)}</strong>;
-    if (c.length > 2 && c.startsWith('/') && c.endsWith('/'))
-      return <em key={`${keyPrefix}-${i}`}>{c.slice(1, -1)}</em>;
-    return <React.Fragment key={`${keyPrefix}-${i}`}>{c}</React.Fragment>;
-  });
+  const out: React.ReactNode[] = [];
+  let buf = '';
+  let k = 0;
+  const flush = () => {
+    if (buf) {
+      out.push(<React.Fragment key={`${keyPrefix}-${k++}`}>{buf}</React.Fragment>);
+      buf = '';
+    }
+  };
+  const WORD_LIKE = /[\w/]/;
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === '*' || ch === '/') {
+      const end = text.indexOf(ch, i + 1);
+      const hasNewline = end !== -1 && text.includes('\n', i) && text.indexOf('\n', i) < end;
+      if (
+        end > i + 1 &&
+        end - i <= 201 &&
+        !hasNewline &&
+        (ch === '*' || (i === 0 || !WORD_LIKE.test(text[i - 1])) && (end + 1 >= text.length || !WORD_LIKE.test(text[end + 1])))
+      ) {
+        flush();
+        const inner = text.slice(i + 1, end);
+        out.push(
+          ch === '*' ? (
+            <strong key={`${keyPrefix}-${k++}`}>{inner}</strong>
+          ) : (
+            <em key={`${keyPrefix}-${k++}`}>{inner}</em>
+          )
+        );
+        i = end + 1;
+        continue;
+      }
+    }
+    buf += ch;
+    i += 1;
+  }
+  flush();
+  return out;
 }
 
 function InlineSpoiler({ text }: { text: string }) {

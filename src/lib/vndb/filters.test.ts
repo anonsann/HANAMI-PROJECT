@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { F, andAll, buildVnFilter, buildReleaseFilter, buildCharacterFilter, EMPTY_VN_FILTER, EMPTY_RELEASE_FILTER, EMPTY_CHARACTER_FILTER } from './filters';
+import { F, andAll, normalizeBooleanGroups, buildVnFilter, buildReleaseFilter, buildCharacterFilter, EMPTY_VN_FILTER, EMPTY_RELEASE_FILTER, EMPTY_CHARACTER_FILTER } from './filters';
 
 describe('filter primitives', () => {
   it('builds predicates', () => {
@@ -93,5 +93,62 @@ describe('buildCharacterFilter', () => {
     expect(f).toContain('"trait","!=",["i900",1]');
     expect(f).toContain('"height",">=",150');
     expect(f).toContain('"height","<=",180');
+  });
+});
+
+describe('normalizeBooleanGroups (SOD-016)', () => {
+  it('unwraps a single-child and', () => {
+    expect(normalizeBooleanGroups(['and', ['id', '>=', 'v5']])).toEqual(['id', '>=', 'v5']);
+  });
+  it('unwraps a single-child or', () => {
+    expect(normalizeBooleanGroups(['or', ['lang', '=', 'ja']])).toEqual(['lang', '=', 'ja']);
+  });
+  it('keeps genuine multi-child groups', () => {
+    const f = ['and', ['lang', '=', 'ja'], ['platform', '=', 'win']];
+    expect(normalizeBooleanGroups(f)).toEqual(f);
+  });
+  it('recurses into nested groups', () => {
+    const f = ['and', ['or', ['lang', '=', 'ja']], ['id', '>=', 'v5']];
+    expect(normalizeBooleanGroups(f)).toEqual(['and', ['lang', '=', 'ja'], ['id', '>=', 'v5']]);
+  });
+  it('drops empty groups produced by all-false children', () => {
+    expect(normalizeBooleanGroups(['and', ['and'], ['id', '=', 'v1']])).toEqual(['id', '=', 'v1']);
+  });
+  it('returns non-array filters untouched', () => {
+    expect(normalizeBooleanGroups([])).toEqual([]);
+  });
+});
+
+describe('single-predicate filter construction (SOD-016)', () => {
+  it('F.and with one predicate is normalized to the predicate itself', () => {
+    expect(F.and(['lang', '=', 'ja'])).toEqual(['lang', '=', 'ja']);
+  });
+  it('F.or with one predicate is normalized to the predicate itself', () => {
+    expect(F.or(['lang', '=', 'ja'])).toEqual(['lang', '=', 'ja']);
+  });
+  it('F.and with several predicates keeps the group', () => {
+    expect(F.and(['lang', '=', 'ja'], ['lang', '=', 'en'])).toEqual([
+      'and',
+      ['lang', '=', 'ja'],
+      ['lang', '=', 'en']
+    ]);
+  });
+});
+
+describe('buildVnFilter single-language case (SOD-016)', () => {
+  it('a lone language filter compiles to a plain predicate, not a 1-child and', () => {
+    const f = buildVnFilter({ ...EMPTY_VN_FILTER, langs: ['ja'] });
+    expect(f).toEqual(['lang', '=', 'ja']);
+  });
+  it('andAll output never contains 1-child boolean groups', () => {
+    const f = andAll(['search', '=', 'x'], F.and(['lang', '=', 'ja']));
+    const bad: unknown[] = [];
+    const walk = (node: unknown): void => {
+      if (!Array.isArray(node)) return;
+      if ((node[0] === 'and' || node[0] === 'or') && node.length === 2) bad.push(node);
+      node.slice(1).forEach(walk);
+    };
+    walk(f);
+    expect(bad).toEqual([]);
   });
 });

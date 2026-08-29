@@ -38,7 +38,7 @@ export default function TagsPage() {
       filters: filter,
       fields: TAG_CARD,
       sort: sortVnCount ? 'vn_count' : debounced.trim() ? 'searchrank' : 'name',
-      reverse: sortVnCount,
+      reverse: sortVnCount || !!debounced.trim(), // SOD-021: vn_count & searchrank are desc-worthy
       results: PAGE_SIZE,
       page,
       count: page === 1

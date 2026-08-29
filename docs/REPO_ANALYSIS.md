@@ -31,9 +31,12 @@ below.
 
 ## Phase 2 — External effects scan
 
-The app consumes **one** external service: the official VNDB API v2. No analytics, no fonts
-CDN (fonts are stack-native), no icon pack (inline SVG), no image re-hosting. Attribution
-and hotlink policy compliance are documented in the README.
+The app consumes **one** data service: the official VNDB API v2. No analytics, no icon pack
+(inline SVG), no image re-hosting. Two further third-party touchpoints exist and are
+disclosed here (SOD-025): Google Fonts is loaded from `fonts.googleapis.com` in
+`index.html` (Cinzel, Inter, Shippori Mincho B1, JetBrains Mono, Source Serif 4), and VNDB
+cover art is hotlinked from `t.vndb.org`. Attribution and hotlink policy compliance are
+documented in the README.
 
 ## Phase 3 — Bug hunt & triage
 
@@ -122,3 +125,68 @@ countermeasure shipped here:
 - i18n of the UI copy is out of scope for this release (English-only is a product decision).
 
 — Report end. Generated for the `arena/01a04d66-vndb-client-web` branch.
+
+---
+
+# Second audit — executive report (2026-08-29, branch `arena/01a04ef3-vndb-client-web`)
+
+A complete re-analysis of the merged codebase. Method: module-by-module manual review
+(all 19 pages, 12 components, the data layer, stores and tooling), contract verification
+against the live kana docs + `GET /schema`, dependency/lockfile audit, toolchain dry-runs
+(`npm ci`, `tsc`, `eslint`, `vitest`, `vite build`), and security review of every boundary
+that touches user input (URL params, API-token custody, markup rendering, CSV export).
+
+## What the sweep found — by severity
+
+| Severity | Count | IDs |
+| --- | --- | --- |
+| high | 2 | SOD-013 (lockfile drift → `npm ci` fails everywhere), SOD-014 (lint toolchain broken) |
+| medium | 4 | SOD-015 (dead "has description" filter), SOD-016 (1-child boolean filters vs documented kana contract), SOD-017 (platform enum drift; one filter chip 400s), SOD-019 (shelf remount broke edit modal mid-save) |
+| low | 10 | SOD-018, SOD-020, SOD-021, SOD-023, SOD-024, SOD-025, SOD-026, SOD-027, SOD-028, SOD-030 |
+| trivial | 2 | SOD-022, SOD-029 |
+
+All 18 are fixed on this branch; 35 new unit tests pin the behavior (suite now 106/106).
+
+## Notable non-findings (verified correct, recorded to prevent re-flagging)
+
+- `reverse: sortDir === 'asc' ? false : true` in VnBrowse is **correct**: kana's default
+  sort order is ascending, `reverse: true` yields descending (documented).
+- `quote.character`, staff `ismain` filter, `birthday=[m,0]` wildcard, `fields: ''` with
+  `results: 0` count probes, ulist sort fields, tag/trait `vn_count`/`char_count` sorts —
+  all valid per the published schema/docs.
+- `releasedBetween` partial-date comparison matches the documented VNDB ordering rule
+  ("2022" sorts after "2022-12-31").
+- API-token custody (localStorage + `Authorization` header only to `*.vndb.org` hosts,
+  enforced in `VndbClient.maySendAuth`) remains sound; the token is never attached to
+  custom API-base URLs outside the `vndb.org` domain.
+- Markup rendering is XSS-safe (React text nodes only; `javascript:`/`data:` URLs rejected
+  in `[url=]`).
+
+## Recurring patterns & prevention (Phase 7)
+
+1. **Hand-curated enums drift.** SOD-017/SOD-018 came from memory-written maps. The fix
+   pins them with schema-mirror tests; the long-term fix is generating `enums.ts` from
+   `GET /schema` at build time (suggested follow-up — the schema is documented as stable
+   enough for code generation).
+2. **URL-as-truth needs a round-trip test.** SOD-015 happened because a state field lost
+   its URL mapping during UI rework. `vnFilterUrl.ts` now has explicit read/write/round-trip
+   tests; any new filter field must extend them.
+3. **State-store keys are not a refetch API.** SOD-019: keying a component by a mutation
+   counter remounts and destroys UI state. Prefer in-place reload hooks.
+4. **Docs claims need a CI anchor.** SOD-025/SOD-026: claims ("no fonts CDN", "GH Actions
+   CI") drifted from reality. The hardened pipeline is written (`docs/examples/ci.yml`,
+   also staged at `.github/workflows/ci.yml` in this working tree); activating it needs a
+   one-file copy by a maintainer because the sandbox's GitHub App token may not create
+   workflow files. Until then the `npm run verify` gate covers the same checks locally.
+5. **Browser-target conservatism.** SOD-024: a regex feature below `esbuild`'s target
+   radar (lookbehind) bricked older Safari. Regex features should be treated like syntax
+   features; lint rule `mozilla/no-useless-`-style guardrails or a compat wrapper could be
+   added later.
+
+## Monitoring & logging suggestions (Phase 7)
+
+- The client already emits queue events (`onEvent`); a debug-only console sink
+  (`localStorage.hanami.debug === '1'`) would make field diagnosis possible without
+  shipping telemetry (the project promises zero tracking — keep it opt-in and local).
+- Surface `ApiError.kind`/`status` counts on the Settings rate-budget meter to spot
+  systematic 400s (the class of bug seen in SOD-017's `xsx` chip) early.
