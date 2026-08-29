@@ -1,0 +1,57 @@
+{
+  "name": "sakura-odyssey",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A visual-novel-flavored, fully open-source web client for the Visual Novel Database (VNDB API v2).",
+  "license": "MIT",
+  "keywords": [
+    "vndb",
+    "visual-novel",
+    "client",
+    "react",
+    "spa",
+    "open-source"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anonsann/vndb-client-web.git"
+  },
+  "author": "Sakura Odyssey contributors",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.3",
+    "zustand": "^4.5.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "postcss": "^8.4.49",
+    "postcss-nested": "^7.0.2",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
