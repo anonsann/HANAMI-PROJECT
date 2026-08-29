@@ -53,10 +53,16 @@ export const useAuth = create<AuthState>()((set, get) => ({
       set({ error: 'Please paste your VNDB API token first.' });
       return false;
     }
+    // SOD-028: preserve any currently-active session so a failed re-login
+    // attempt can't silently deauthenticate the user.
+    const previous = get();
+    const prevToken = previous.token;
     set({ busy: true, error: null });
     try {
       vndb.setToken(clean);
       const info = await vndb.getAuth<AuthInfo>('authinfo');
+      // Drop the previous account's cached reads before swapping identities.
+      vndb.clearCache();
       const stored: StoredAuth = { token: clean, user: { id: info.id, username: info.username }, permissions: info.permissions };
       try {
         localStorage.removeItem(LS_KEY);
@@ -68,11 +74,17 @@ export const useAuth = create<AuthState>()((set, get) => ({
       set({ token: clean, user: stored.user, permissions: info.permissions, busy: false, error: null });
       return true;
     } catch (e) {
-      vndb.setToken(null);
-      set({
-        busy: false,
-        error: e instanceof Error ? e.message : 'Could not sign in with that token.'
-      });
+      if (prevToken) {
+        // Restore the previous session exactly as it was.
+        vndb.setToken(prevToken);
+        set({ busy: false, error: e instanceof Error ? e.message : 'Could not sign in with that token.' });
+      } else {
+        vndb.setToken(null);
+        set({
+          busy: false,
+          error: e instanceof Error ? e.message : 'Could not sign in with that token.'
+        });
+      }
       return false;
     }
   },
