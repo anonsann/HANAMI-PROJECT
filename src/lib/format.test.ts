@@ -105,3 +105,20 @@ describe('misc formats', () => {
     expect(formatVote(null)).toBe('—');
   });
 });
+
+describe('parseVndbDate validation (SOD-030)', () => {
+  it('rejects impossible months and days instead of rendering "undefined"', () => {
+    expect(formatVndbDate('2022-13-05')).toBe('Unknown');
+    expect(formatVndbDate('2022-00-10')).toBe('Unknown');
+    expect(formatVndbDate('2022-02-31')).toBe('Unknown');
+    expect(formatVndbDate('2022-04-31')).toBe('Unknown');
+  });
+  it('still accepts real dates and partial forms', () => {
+    expect(formatVndbDate('2022-02-28')).toBe('Feb 28, 2022');
+    expect(formatVndbDate('2022-02')).toBe('Feb 2022');
+    expect(formatVndbDate('2022')).toBe('2022');
+  });
+  it('rejects day 00 in exact dates', () => {
+    expect(formatVndbDate('2022-05-00')).toBe('Unknown');
+  });
+});
