@@ -1,0 +1,136 @@
+{
+  "project": "sakura-odyssey (anonsann/vndb-client-web)",
+  "branch": "arena/01a04d66-vndb-client-web",
+  "generated": "2026-08-29",
+  "severityScale": ["critical", "high", "medium", "low", "trivial"],
+  "bugs": [
+    {
+      "id": "SOD-001",
+      "title": "\"Has\" VN filters never compiled into API predicates",
+      "severity": "medium",
+      "class": "functionality",
+      "foundBy": "unit-test",
+      "area": "src/lib/vndb/filters.ts",
+      "symptom": "Toggling hasAnime/hasScreenshot/hasDescription/hasReview produced identical result sets",
+      "rootCause": "buildVnFilter omitted the four boolean flags despite them existing in VNFilterState",
+      "resolution": "Compile each flag to ['has_*','=',1]; regression test added"
+    },
+    {
+      "id": "SOD-002",
+      "title": "searchrank sort active without a search filter",
+      "severity": "medium",
+      "class": "correctness",
+      "foundBy": "code-review",
+      "area": "src/pages/*BrowsePage.tsx",
+      "symptom": "Relevance sort without a query returned unintuitive ordering",
+      "rootCause": "API documents searchrank relies on a present 'search' filter",
+      "resolution": "Degrade searchrank -> rating when the query is blank"
+    },
+    {
+      "id": "SOD-003",
+      "title": "Random quote batch collapsed to one response by in-flight dedupe",
+      "severity": "low",
+      "class": "ux",
+      "foundBy": "code-review",
+      "area": "src/pages/VnDetailPage.tsx",
+      "symptom": "N requested quotes returned N duplicates of one quote",
+      "rootCause": "Identical request payloads intentionally share one in-flight promise",
+      "resolution": "Single query with an or-chain of ['random','=',1'] x N"
+    },
+    {
+      "id": "SOD-004",
+      "title": "List-row busy flags read non-reactively",
+      "severity": "low",
+      "class": "reactivity",
+      "foundBy": "code-review",
+      "area": "src/pages/MyListPage.tsx",
+      "symptom": "Edit/remove spinners missed updates",
+      "rootCause": "useUlist.getState().busy read during render is not a subscription",
+      "resolution": "Shelf subscribes to the busy map and passes flags via props"
+    },
+    {
+      "id": "SOD-005",
+      "title": "devstatus badge comparison unreachable under strict types",
+      "severity": "low",
+      "class": "typing",
+      "foundBy": "tsc",
+      "area": "src/components/VnCard.tsx",
+      "symptom": "In-development/TBA marker could never render",
+      "rootCause": "'1|2 !== 0' no-overlap after truthiness narrowing",
+      "resolution": "Explicit undefined + 0 checks"
+    },
+    {
+      "id": "SOD-006",
+      "title": "Tag inclusive toggle offered non-API semantics",
+      "severity": "low",
+      "class": "api-semantics",
+      "foundBy": "code-review",
+      "area": "src/components/FiltersPanel.tsx",
+      "symptom": "ANY/ALL promise not supported by id-inclusion for tags",
+      "resolution": "Removed toggle; includes are AND"
+    },
+    {
+      "id": "SOD-007",
+      "title": "Wide layout toggle had no CSS effect",
+      "severity": "low",
+      "class": "functionality",
+      "foundBy": "ui-review",
+      "area": "src/styles/index.css",
+      "rootCause": "html[data-wide='true'] overrides were never authored",
+      "resolution": "Added .max-w-* overrides; Shell applies attribute"
+    },
+    {
+      "id": "SOD-008",
+      "title": "Dead default React imports across 17 modules",
+      "severity": "trivial",
+      "class": "hygiene",
+      "foundBy": "tsc",
+      "area": "src/**",
+      "resolution": "Removed; named hook imports kept"
+    },
+    {
+      "id": "SOD-009",
+      "title": "react-router advisories (open redirect, SSR deserialization)",
+      "severity": "medium",
+      "class": "security-dependency",
+      "foundBy": "npm-audit",
+      "area": "package.json",
+      "advisories": ["GHSA-wrjc-x8rr-h8h6", "GHSA-337j-9hxr-rhxg"],
+      "fixVersion": "react-router-dom@7.18.3"
+    },
+    {
+      "id": "SOD-010",
+      "title": "Guest shelf lookup typed as scalar while API returns a map",
+      "severity": "medium",
+      "class": "typing-crash",
+      "foundBy": "tsc",
+      "area": "src/pages/MyListPage.tsx",
+      "resolution": "useGet<Record<string, UserInfo | null>>"
+    },
+    {
+      "id": "SOD-011",
+      "title": "Staff credit grouping dropped aid used for link targets",
+      "severity": "low",
+      "class": "typing-functionality",
+      "foundBy": "tsc",
+      "area": "src/pages/VnDetailPage.tsx",
+      "resolution": "Group map typed as VnStaffEntry[] end-to-end"
+    },
+    {
+      "id": "SOD-012",
+      "title": "Nonexistent mock API in client tests",
+      "severity": "trivial",
+      "class": "testing",
+      "foundBy": "vitest",
+      "area": "src/lib/vndb/client.test.ts",
+      "resolution": "Explicit default implementation instead of getImplementation()"
+    }
+  ],
+  "postFixAudit": {
+    "tsc": "clean",
+    "eslint": "0 problems",
+    "vitest": "71/71 passing",
+    "viteBuild": "clean, 31 chunks",
+    "npmAuditProduction": "0 vulnerabilities"
+  }
+}
