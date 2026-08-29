@@ -13,11 +13,14 @@ import { VnFiltersPanel, type Meta } from '../components/FiltersPanel';
 import { VnCard, VnRow } from '../components/VnCard';
 import { Pager, Select, Skeleton, ErrorState, EmptyState } from '../components/ui';
 import { Icon } from '../components/icons';
-
-interface FullState extends VnFilterState {
-  tagsIncMeta: Meta[];
-  tagsExcMeta: Meta[];
-}
+import {
+  readVnFilterState as readState,
+  writeVnFilterState as writeState,
+  coerceSort,
+  numOr,
+  DEFAULT_SORT,
+  type FullState
+} from '../lib/vndb/vnFilterUrl';
 
 const SORTS = [
   { value: 'rating|desc', label: 'Rating · high → low' },
@@ -30,56 +33,6 @@ const SORTS = [
   { value: 'searchrank|desc', label: 'Search relevance' }
 ];
 
-function readState(sp: URLSearchParams): FullState {
-  const base: FullState = { ...EMPTY_VN_FILTER, tagsIncMeta: [], tagsExcMeta: [] };
-  base.search = sp.get('search') ?? '';
-  base.yearFrom = numOr(sp.get('yf'));
-  base.yearTo = numOr(sp.get('yt'));
-  base.minRating = numOr(sp.get('rating'));
-  base.minVotecount = numOr(sp.get('votes'));
-  base.lengths = (sp.get('len') ?? '').split(',').filter(Boolean).map(Number).filter((n) => n >= 1 && n <= 5);
-  base.devstatus = sp.get('dev') === null ? null : numOr(sp.get('dev'));
-  base.olang = sp.get('olang') || null;
-  base.langs = (sp.get('lang') ?? '').split(',').filter(Boolean);
-  base.platforms = (sp.get('plat') ?? '').split(',').filter(Boolean);
-  base.tagsInc = (sp.get('tag') ?? '').split(',').filter(Boolean);
-  base.tagsExc = (sp.get('xtag') ?? '').split(',').filter(Boolean);
-  base.tagSpoiler = numOr(sp.get('tls')) ?? 0;
-  base.hasAnime = sp.get('anime') === '1';
-  base.hasScreenshot = sp.get('ss') === '1';
-  base.hasReview = sp.get('rev') === '1';
-  return base;
-}
-
-function numOr(v: string | null): number | null {
-  if (v === null || v === '') return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-
-function writeState(s: FullState, sort: string, page: number): URLSearchParams {
-  const p = new URLSearchParams();
-  if (s.search.trim()) p.set('search', s.search.trim());
-  if (s.yearFrom !== null) p.set('yf', String(s.yearFrom));
-  if (s.yearTo !== null) p.set('yt', String(s.yearTo));
-  if (s.minRating !== null) p.set('rating', String(s.minRating));
-  if (s.minVotecount !== null) p.set('votes', String(s.minVotecount));
-  if (s.lengths.length) p.set('len', s.lengths.join(','));
-  if (s.devstatus !== null) p.set('dev', String(s.devstatus));
-  if (s.olang) p.set('olang', s.olang);
-  if (s.langs.length) p.set('lang', s.langs.join(','));
-  if (s.platforms.length) p.set('plat', s.platforms.join(','));
-  if (s.tagsInc.length) p.set('tag', s.tagsInc.join(','));
-  if (s.tagsExc.length) p.set('xtag', s.tagsExc.join(','));
-  if (s.tagSpoiler) p.set('tls', String(s.tagSpoiler));
-  if (s.hasAnime) p.set('anime', '1');
-  if (s.hasScreenshot) p.set('ss', '1');
-  if (s.hasReview) p.set('rev', '1');
-  if (sort !== 'rating|desc') p.set('sort', sort);
-  if (page > 1) p.set('page', String(page));
-  return p;
-}
-
 export default function VnBrowsePage() {
   useTitle('Visual Novels');
   const [params, setParams] = useSearchParams();
@@ -88,7 +41,7 @@ export default function VnBrowsePage() {
   const [view, setView] = useState<'grid' | 'list'>(density === 'compact' ? 'list' : 'grid');
 
   const state = useMemo(() => readState(params), [params]);
-  const sort = params.get('sort') ?? 'rating|desc';
+  const sort = coerceSort(params.get('sort'));
   const page = Math.max(1, numOr(params.get('page')) ?? 1);
 
   const [meta, setMeta] = useState<Record<string, Meta>>({});
@@ -151,7 +104,7 @@ export default function VnBrowsePage() {
   const count = res.data?.count;
   const totalPages = count !== undefined ? Math.max(1, Math.ceil(count / pageSize)) : page + (res.data?.more ? 1 : 0);
 
-  function commit(next: FullState, nextSort = sort, nextPage = 1) {
+  function commit(next: VnFilterState, nextSort: string = sort, nextPage = 1) {
     setParams(writeState(next, nextSort, nextPage), { replace: !hasSearch });
   }
 
@@ -178,7 +131,10 @@ export default function VnBrowsePage() {
         Combine languages, platforms, tags, ratings and more.
       </PageHeader>
 
-      <VnFiltersPanel state={fullState} onChange={(s) => commit(s, sort, 1)} onReset={() => commit({ ...EMPTY_VN_FILTER, tagsIncMeta: [], tagsExcMeta: [] }, 'rating|desc', 1)} total={count} />
+      <VnFiltersPanel state={fullState} onChange={(s) => commit(s, sort, 1)} onReset={() => {
+              setMeta({});
+              commit({ ...EMPTY_VN_FILTER }, DEFAULT_SORT, 1);
+            }} total={count} />
 
       {res.status === 'loading' && !res.data ? (
         view === 'grid' ? (

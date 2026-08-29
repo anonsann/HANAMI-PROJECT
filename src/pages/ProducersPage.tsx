@@ -40,7 +40,7 @@ export default function ProducersPage() {
       filters: filter,
       fields: PRODUCER_CARD,
       sort: debounced.trim() ? 'searchrank' : 'name',
-      reverse: false,
+      reverse: !!debounced.trim(), // SOD-021: searchrank desc; name asc
       results: PAGE_SIZE,
       page,
       count: page === 1

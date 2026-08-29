@@ -66,7 +66,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         fields,
         results: 4,
         sort: 'searchrank' as const,
-        reverse: false
+        reverse: true // SOD-021: relevance is meaningful high→low (reverse=true = descending)
       });
       try {
         const [vnRes, charRes, prodRes, staffRes] = await Promise.all([
