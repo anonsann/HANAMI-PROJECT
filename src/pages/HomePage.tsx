@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useApi, useGet } from '../lib/vndb/resource';
 import { QUOTE_FULL, VN_CARD } from '../lib/vndb/fields';
 import type { DbStats, Quote, VisualNovel } from '../lib/vndb/types';
-import { mulberry32, unique } from '../lib/utils';
+import { mulberry32 } from '../lib/utils';
 import { useTitle } from '../hooks';
 import { Typewriter, DialogueBox, Reveal, CountUp, RatingGauge } from '../components/visual';
 import { VnRailSection } from '../components/PageBits';
@@ -52,7 +52,7 @@ export default function HomePage() {
     while (copy.length > 0 && out.length < 6) {
       out.push(copy.splice(Math.floor(rng() * copy.length), 1)[0]);
     }
-    return unique(out.map((v) => v.id)).length === out.length ? out : out;
+    return out;
   }, [picks.data]);
 
   return (

@@ -52,8 +52,8 @@ export function ListPanel({ vnId, vnTitle }: { vnId: string; vnTitle: string }) 
       <div className="card-surface px-4 py-3 text-sm text-mute">
         <Icon name="lock" size={14} className="mr-1.5 inline-block text-gold" />
         Connect your VNDB account on the{' '}
-        <Link to="/settings" className="link-fancy">
-          Tuning page
+        <Link to="/list" className="link-fancy">
+          My Shelf page
         </Link>{' '}
         to track this novel on your shelf.
       </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { cls } from '../lib/utils';
 import { shouldBlurImage, nsfwReason } from '../lib/spoiler';
 import { useSettings } from '../store/settings';
@@ -148,9 +149,9 @@ export function TagList({
   const shown = visible.slice(0, max);
 
   const chip = (t: VnTagEntry, dimmed = false) => (
-    <a
+    <Link
       key={`${t.id}-${t.lie ? 'l' : 'n'}`}
-      href={`/g/${t.id}`}
+      to={`/g/${t.id}`}
       title={t.description ?? t.name}
       className={cls(
         'chip transition-colors hover:border-brand/60 hover:text-brand',
@@ -167,7 +168,7 @@ export function TagList({
       {t.name}
       {t.lie ? <span className="text-[10px] text-gold" title="Marked as misleading / joke vote">±</span> : null}
       <span className="font-mono text-[10px] text-faint">{(t.rating ?? 0).toFixed(1)}</span>
-    </a>
+    </Link>
   );
 
   return (
@@ -218,10 +219,10 @@ export function RelationChips({ relations }: { relations: { id: string; relation
     <ul className="flex flex-wrap gap-1.5">
       {relations.map((r) => (
         <li key={`${r.id}-${r.relation}`}>
-          <a href={`/v/${r.id}`} className="chip transition-colors hover:border-brand/60 hover:text-brand" title={`${RELATIONS[r.relation] ?? r.relation}${r.relation_official ? '' : ' (unofficial)'}`}>
+          <Link to={`/v/${r.id}`} className="chip transition-colors hover:border-brand/60 hover:text-brand" title={`${RELATIONS[r.relation] ?? r.relation}${r.relation_official ? '' : ' (unofficial)'}`}>
             <span className="font-semibold text-gold/90">{RELATIONS[r.relation] ?? r.relation}</span>
             {r.title ?? r.id}
-          </a>
+          </Link>
         </li>
       ))}
     </ul>
