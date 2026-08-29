@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cls, clamp, chunk, unique, extractVndbid, cmpVndbid, joinUrl, hoursFromMinutes, squeeze, mulberry32, mapLimit } from './utils';
+import { cls, clamp, chunk, unique, extractVndbid, cmpVndbid, joinUrl, hoursFromMinutes, squeeze, mulberry32, mapLimit, csvCell } from './utils';
 
 describe('cls', () => {
   it('joins truthy strings', () => {
@@ -79,5 +79,24 @@ describe('mapLimit', () => {
     });
     expect(results).toEqual(items.map((n) => n * 2));
     expect(maxActive).toBeLessThanOrEqual(3);
+  });
+});
+
+describe('csvCell formula-injection hardening (SOD-023)', () => {
+  it('prefixes cells that spreadsheet apps interpret as formulas', () => {
+    expect(csvCell('=cmd|/c calc')).toBe("'=cmd|/c calc");
+    expect(csvCell('+1+1')).toBe("'+1+1");
+    expect(csvCell('-2-2')).toBe("'-2-2");
+    expect(csvCell('@SUM(A1)')).toBe("'@SUM(A1)");
+    expect(csvCell('\tTAB')).toBe("'\tTAB");
+  });
+  it('still quotes commas, quotes and newlines', () => {
+    expect(csvCell('a,b')).toBe('"a,b"');
+    expect(csvCell('say "hi"')).toBe('"say ""hi"""');
+    expect(csvCell('line\nbreak')).toBe('"line\nbreak"');
+  });
+  it('leaves benign text alone', () => {
+    expect(csvCell('Clannad')).toBe('Clannad');
+    expect(csvCell('v17')).toBe('v17');
   });
 });
