@@ -9,7 +9,7 @@ import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
 import { CoverImage } from '../components/data';
 import { Pager, Skeleton, ErrorState, EmptyState, Field } from '../components/ui';
-import { Reveal } from '../components/visual';
+import { Reveal, SlideIn } from '../components/visual';
 import { Icon } from '../components/icons';
 import { cls } from '../lib/utils';
 import { guessTotalPages } from '../lib/pageUtils';
@@ -74,7 +74,7 @@ export default function TraitsPage() {
       ) : groups.length === 0 ? (
         <EmptyState title="No traits found." />
       ) : (
-        <div className="space-y-5">
+        <SlideIn className="space-y-5">
           {groups.map(([group, traits]) => (
             <Reveal key={group}>
               <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gold">{group}</h2>
@@ -92,7 +92,7 @@ export default function TraitsPage() {
               </div>
             </Reveal>
           ))}
-        </div>
+        </SlideIn>
       )}
       {totalPages > 1 ? <Pager page={page} totalPages={totalPages} onChange={setPage} /> : null}
     </div>

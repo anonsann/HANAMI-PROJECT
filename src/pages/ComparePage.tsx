@@ -11,9 +11,9 @@ import { formatVndbDate, lengthDisplay, ratingLabel } from '../lib/format';
 import { cls } from '../lib/utils';
 import { PageHeader } from '../components/PageBits';
 import { CoverImage, TagList } from '../components/data';
-import { RatingGauge } from '../components/visual';
+import { GlowBox, Magnetize, RatingGauge, Reveal, TiltCard } from '../components/visual';
 import { RadarChart } from '../components/Charts';
-import { Skeleton, ErrorState, EmptyState, Toggle } from '../components/ui';
+import { Skeleton, ErrorState, EmptyState } from '../components/ui';
 import { Icon } from '../components/icons';
 
 const COMPARE_FIELDS =
@@ -51,7 +51,7 @@ export default function ComparePage() {
             </button>
           ) : null}
           {compare.ids.length >= 2 ? (
-            <Toggle checked={tableMode} onChange={setTableMode} label="Table view" />
+            <ModeToggle tableMode={tableMode} onChange={setTableMode} />
           ) : null}
         </div>
       }>
@@ -80,13 +80,14 @@ export default function ComparePage() {
         <ErrorState error={res.error} onRetry={res.reload} />
       ) : vns.length >= 2 ? (
         <>
-          <RevealWrap>
+          <Reveal>
             {dims.series.length > 0 ? (
-              <div className="card-surface grid gap-6 p-6 md:grid-cols-[minmax(0,320px)_1fr] md:items-center">
+              <GlowBox className="h-full">
+              <div className="grid gap-6 border border-line bg-panel p-5 md:grid-cols-[minmax(0,320px)_1fr] md:items-center">
                 <RadarChart series={dims.series} />
                 <div>
-                  <h2 className="section-title mb-2 text-sm">Normalized fate lines</h2>
-                  <p className="max-w-lg text-sm text-mute">
+                  <h2 className="mb-2 font-display text-[15px] font-semibold text-brand2">Normalized fate lines</h2>
+                  <p className="max-w-lg text-[13px] text-mute">
                     Each axis is scaled to the strongest contender in the tray: rating, vote count,
                     reading time, language reach and platform breadth.
                   </p>
@@ -100,8 +101,9 @@ export default function ComparePage() {
                   </ul>
                 </div>
               </div>
+              </GlowBox>
             ) : null}
-          </RevealWrap>
+          </Reveal>
 
           {tableMode ? (
             <div className="card-surface overflow-x-auto">
@@ -133,7 +135,8 @@ export default function ComparePage() {
           ) : (
             <div className={`grid gap-4 ${vns.length > 2 ? 'md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'md:grid-cols-2'}`}>
               {vns.map((v) => (
-                <div key={v.id} className="card-surface space-y-3 p-4">
+                <TiltCard key={v.id} max={5}>
+                <div className="card-surface h-full space-y-3 p-4">
                   <div className="flex gap-3">
                     <CoverImage image={v.image} alt={v.title} className="w-20 shrink-0" />
                     <div className="min-w-0">
@@ -144,6 +147,7 @@ export default function ComparePage() {
                   <RatingGauge rating={v.rating ?? null} size={86} label={`${(v.votecount ?? 0).toLocaleString()} votes`} />
                   <TagList tags={(v.tags ?? []).filter((t) => t.rating >= 2).slice(0, 8)} max={8} maxSpoiler={spoilerMax} compact />
                 </div>
+                </TiltCard>
               ))}
             </div>
           )}
@@ -155,8 +159,30 @@ export default function ComparePage() {
 
 /* ----------------------------- Helper components ----------------------------- */
 
-function RevealWrap({ children }: { children: React.ReactNode }) {
-  return <section className="animate-fade-up">{children}</section>;
+/** Magnetic pill toggle between the table and card views. */
+function ModeToggle({ tableMode, onChange }: { tableMode: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <Magnetize strength={12}>
+      <div className="flex rounded-sm border border-line bg-panel p-0.5" role="group" aria-label="Compare view">
+        <button
+          type="button"
+          aria-pressed={tableMode}
+          onClick={() => onChange(true)}
+          className={cls('rounded-sm px-2.5 py-1 text-[12px]', tableMode ? 'bg-brand/15 text-brand' : 'text-faint hover:text-ink')}
+        >
+          Table
+        </button>
+        <button
+          type="button"
+          aria-pressed={!tableMode}
+          onClick={() => onChange(false)}
+          className={cls('rounded-sm px-2.5 py-1 text-[12px]', !tableMode ? 'bg-brand/15 text-brand' : 'text-faint hover:text-ink')}
+        >
+          Cards
+        </button>
+      </div>
+    </Magnetize>
+  );
 }
 
 function ComparisonRow({

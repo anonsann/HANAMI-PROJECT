@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Icon } from './icons';
+import { GlassPanel } from './ui';
 
 export interface LightboxItem {
   src: string;
@@ -51,14 +52,16 @@ export function Lightbox({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3 text-sm text-faint">
-        <span>
-          {current.alt} · {index + 1} / {count}
-        </span>
-        <button type="button" className="btn-quiet p-1.5" onClick={onClose} aria-label="Close viewer">
-          <Icon name="x" size={20} />
-        </button>
-      </div>
+      <GlassPanel className="mx-3 mt-3 shrink-0 px-3 py-2" width="100%">
+        <div className="flex items-center justify-between gap-3 text-[12px] text-mute">
+          <span className="min-w-0 truncate">
+            {current.alt} · {index + 1} / {count}
+          </span>
+          <button type="button" className="btn-quiet p-1" onClick={onClose} aria-label="Close viewer">
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+      </GlassPanel>
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 pb-6">
         {count > 1 ? (
           <button type="button" onClick={prev} aria-label="Previous image" className="btn-quiet absolute left-2 z-10 p-2 sm:left-6">
@@ -70,7 +73,7 @@ export function Lightbox({
           src={current.src}
           alt={current.alt}
           onLoad={() => setLoaded(true)}
-          className={`max-h-full max-w-full rounded-lg object-contain shadow-lift transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`max-h-full max-w-full rounded-sm object-contain shadow-lift transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
         {count > 1 ? (
           <button type="button" onClick={next} aria-label="Next image" className="btn-quiet absolute right-2 z-10 p-2 sm:right-6">

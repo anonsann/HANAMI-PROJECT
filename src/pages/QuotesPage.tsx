@@ -5,8 +5,8 @@ import { QUOTE_FULL } from '../lib/vndb/fields';
 import type { Quote } from '../lib/vndb/types';
 import { useTitle } from '../hooks';
 import { PageHeader } from '../components/PageBits';
-import { DialogueBox } from '../components/visual';
-import { Skeleton, ErrorState } from '../components/ui';
+import { DialogueBox, Magnetize, Reveal } from '../components/visual';
+import { LoadMore, Skeleton, ErrorState } from '../components/ui';
 import { Icon } from '../components/icons';
 
 const BATCH = 4;
@@ -44,20 +44,23 @@ export default function QuotesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <PageHeader kana="名言" title="Voices" actions={
-        <button type="button" className="btn-gold" onClick={() => void load(true)} disabled={status === 'loading'}>
-          <Icon name="refresh" size={14} /> Other voices
-        </button>
+        <Magnetize strength={14}>
+          <button type="button" className="btn-gold" onClick={() => void load(true)} disabled={status === 'loading'}>
+            <Icon name="refresh" size={14} /> Other voices
+          </button>
+        </Magnetize>
       }>
         Fragments that outlived their stories. Sourced from the same collection as the VNDB footer.
       </PageHeader>
 
       {status === 'loading' && quotes.length === 0 ? (
-        <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)}</div>
+        <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-28 rounded-sm" />)}</div>
       ) : status === 'error' && quotes.length === 0 ? (
         <ErrorState error={error} onRetry={() => void load(true)} />
       ) : (
         <div className="space-y-4">
           {quotes.map((q, i) => (
+            <Reveal key={`${q.id}-${i}-${q.quote.slice(0, 12)}`} delay={Math.min(i, 4) * 60}>
             <DialogueBox
               key={`${q.id}-${i}-${q.quote.slice(0, 12)}`}
               name={
@@ -85,15 +88,21 @@ export default function QuotesPage() {
             >
               “{q.quote}”
             </DialogueBox>
+            </Reveal>
           ))}
         </div>
       )}
 
       {quotes.length > 0 ? (
-        <div className="flex justify-center">
-          <button type="button" className="btn-ghost" onClick={() => void load(false)} disabled={status === 'loading'}>
-            <Icon name="plus" size={14} /> More voices
-          </button>
+        <div className="flex justify-center pt-4">
+          <Magnetize strength={14}>
+            <LoadMore
+              loading={status === 'loading'}
+              hasMore
+              onClick={() => void load(false)}
+              shown={quotes.length}
+            />
+          </Magnetize>
         </div>
       ) : null}
     </div>

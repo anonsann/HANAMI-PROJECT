@@ -36,7 +36,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', 'zustand']
+          vendor: ['react', 'react-dom', 'react-router-dom', 'zustand'],
+          // Animation engines used by the vendored ReactBits components. Split
+          // out so they cache independently of app code and load in parallel.
+          motion: ['motion/react', 'framer-motion'],
+          gsap: ['gsap'],
+          ogl: ['ogl']
         }
       }
     }

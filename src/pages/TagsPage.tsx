@@ -10,7 +10,7 @@ import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
 import { Pager, Select, Skeleton, ErrorState, EmptyState, Field } from '../components/ui';
 import { VnCard } from '../components/VnCard';
-import { Reveal } from '../components/visual';
+import { Reveal, SlideIn } from '../components/visual';
 import { Icon } from '../components/icons';
 import { cls } from '../lib/utils';
 
@@ -75,7 +75,7 @@ export default function TagsPage() {
       ) : (res.data?.results.length ?? 0) === 0 ? (
         <EmptyState title="No tags found." />
       ) : (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <SlideIn className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {res.data!.results.map((t) => (
             <Link
               key={t.id}
@@ -92,7 +92,7 @@ export default function TagsPage() {
               <span className="shrink-0 font-mono text-xs text-faint">{t.vn_count.toLocaleString()}</span>
             </Link>
           ))}
-        </div>
+        </SlideIn>
       )}
       {totalPages > 1 ? <Pager page={page} totalPages={totalPages} onChange={setPage} /> : null}
     </div>

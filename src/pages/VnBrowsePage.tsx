@@ -9,6 +9,7 @@ import { cls, squeeze } from '../lib/utils';
 import { useTitle } from '../hooks';
 import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
+import { Magnetize, SlideIn } from '../components/visual';
 import { VnFiltersPanel, type Meta } from '../components/FiltersPanel';
 import { VnCard, VnRow } from '../components/VnCard';
 import { Pager, Select, Skeleton, ErrorState, EmptyState } from '../components/ui';
@@ -154,7 +155,7 @@ export default function VnBrowsePage() {
           hint="Loosen the filters — a tag, a year, a platform — and the archive will answer."
         />
       ) : (
-        <>
+        <SlideIn>
           {view === 'grid' ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
               {res.data!.results.map((vn, i) => (
@@ -172,12 +173,14 @@ export default function VnBrowsePage() {
             <Pager page={page} totalPages={totalPages} onChange={(p) => commit(state, sort, p)} />
           ) : res.data?.more ? (
             <div className="flex justify-center">
-              <button type="button" className="btn-ghost" onClick={() => commit(state, sort, page + 1)}>
-                <Icon name="plus" size={15} /> Next page
-              </button>
+              <Magnetize strength={14}>
+                <button type="button" className="btn-ghost" onClick={() => commit(state, sort, page + 1)}>
+                  <Icon name="plus" size={15} /> Next page
+                </button>
+              </Magnetize>
             </div>
           ) : null}
-        </>
+        </SlideIn>
       )}
 
       {res.refreshing ? <p className="text-center text-xs text-faint">Refreshing…</p> : null}

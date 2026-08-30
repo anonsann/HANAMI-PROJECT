@@ -11,8 +11,9 @@ import { dateSortKey, formatRating, formatVndbDate, lengthDisplay, ratingLabel, 
 import { CHARACTER_ROLE_ORDER, characterRoleName, languageName, relationName, staffRoleName, SEXES, VN_LENGTHS, devstatusLabel } from '../lib/vndb/enums';
 import { cls } from '../lib/utils';
 import { CoverImage, TagList, ExtlinkChips, PlatformBadges, LanguageBadges } from '../components/data';
-import { RatingGauge, Reveal } from '../components/visual';
+import { Glare, RatingGauge, Reveal, TiltCard } from '../components/visual';
 import { Tabs, Skeleton, ErrorState, EmptyState } from '../components/ui';
+import { Masonry } from '../reactbits';
 import { Icon } from '../components/icons';
 import { BookmarkButton } from '../components/VnCard';
 import { ListPanel } from '../components/ListPanel';
@@ -114,7 +115,11 @@ function Hero({ vn }: { vn: VisualNovel }) {
       ) : null}
       <div className="relative flex flex-col gap-6 md:flex-row">
         <div className="w-40 shrink-0 sm:w-48 lg:hidden">
-          <CoverImage image={vn.image} alt={vn.title} eager />
+          <TiltCard max={8}>
+            <Glare>
+              <CoverImage image={vn.image} alt={vn.title} eager />
+            </Glare>
+          </TiltCard>
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -489,16 +494,41 @@ function MediaTab({ vn }: { vn: VisualNovel }) {
 
   if (shots.length === 0) return <EmptyState title="No screenshots on record." hint="Media for this novel hasn't been archived yet." />;
 
+  // ReactBits Masonry needs intrinsic heights; VNDB only sometimes reports them,
+  // so fall back to the 16:9 ratio the screenshots are delivered in.
+  const masonryItems = shots
+    .map((s, i) => {
+      const w = s.dims?.[0] ?? 640;
+      const h = s.dims?.[1] ?? 360;
+      if (!s.url) return null;
+      return { id: String(s.id ?? i), img: s.url, url: s.url, height: Math.round((h / w) * 400) };
+    })
+    .filter((x): x is { id: string; img: string; url: string; height: number } => x !== null);
+
   return (
     <div>
-      <p className="mb-3 text-xs text-faint">{shots.length} screenshot{shots.length > 1 ? 's' : ''} · tap to enlarge</p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <p className="mb-3 text-[11px] text-faint">{shots.length} screenshot{shots.length > 1 ? 's' : ''} · tap to enlarge</p>
+      <Masonry
+        items={masonryItems}
+        ease="power3.out"
+        duration={0.6}
+        stagger={0.04}
+        animateFrom="bottom"
+        scaleOnHover
+        hoverScale={0.97}
+        blurToFocus
+        colorShiftOnHover={false}
+      />
+      {/* Keyboard/screen-reader path: Masonry is decorative, these are the real links. */}
+      <ul className="sr-only">
         {shots.map((s, i) => (
-          <button key={s.id ?? i} type="button" onClick={() => setLightbox(i)} className="group text-left" aria-label={`Screenshot ${i + 1}`}>
-            <CoverImage image={s} alt={`${vn.title} screenshot ${i + 1}`} aspect="aspect-video" sizes="(min-width:768px) 25vw, 45vw" />
-          </button>
+          <li key={s.id ?? i}>
+            <button type="button" onClick={() => setLightbox(i)}>
+              Screenshot {i + 1}
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
       {lightbox !== null ? (
         <Lightbox
           items={shots.map((s, i) => ({ src: s.url!, alt: `${vn.title} · screenshot ${i + 1}` }))}

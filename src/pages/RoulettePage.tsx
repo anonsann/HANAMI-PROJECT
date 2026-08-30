@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { vndb, ApiError } from '../lib/vndb/client';
 import { VN_CARD } from '../lib/vndb/fields';
@@ -8,9 +8,9 @@ import { useTitle, useInterval } from '../hooks';
 import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
 import { CoverImage } from '../components/data';
-import { RatingGauge, DialogueBox } from '../components/visual';
+import { DialogueBox, GlowBox, RatingGauge, TiltCard } from '../components/visual';
 import { Icon } from '../components/icons';
-import { Skeleton } from '../components/ui';
+import { BounceCards } from '../reactbits';
 
 type Stage = 'idle' | 'spinning' | 'revealed' | 'error';
 
@@ -105,6 +105,17 @@ export default function RoulettePage() {
 
   const flash = strip.length > 0 ? strip[flashIdx] : null;
 
+  // Covers for the ReactBits BounceCards animation: four sequential frames of
+  // the shuffling strip, falling back to placeholders while the first load runs.
+  const stripImages = useMemo(
+    () =>
+      Array.from({ length: 4 }, (_, off) => {
+        const vn = strip.length ? strip[(flashIdx + off * 7) % strip.length] : null;
+        return vn?.image?.thumbnail ?? vn?.image?.url ?? '';
+      }),
+    [strip, flashIdx]
+  );
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <PageHeader kana="運命" title="Fate Roulette">
@@ -155,18 +166,31 @@ export default function RoulettePage() {
       </div>
 
       {stage === 'spinning' ? (
-        <div className="card-surface flex flex-col items-center gap-4 p-10">
-          <div className="flex gap-2 overflow-hidden">
-            {[0, 1, 2, 3].map((off) => {
-              const vn = strip.length ? strip[(flashIdx + off * 7) % strip.length] : null;
-              return (
-                <div key={off} className="w-28 opacity-90 transition-all duration-100" style={{ transform: `scale(${1 - off * 0.08}) translateY(${off * 4}px)` }}>
-                  {vn ? <CoverImage image={vn.image} alt="…" /> : <Skeleton className="aspect-[3/4] rounded-lg" />}
-                </div>
-              );
-            })}
-          </div>
-          {flash ? <p className="animate-fade-in font-serif text-sm text-mute">{prefersOriginal && flash.alttitle ? flash.alttitle : flash.title}</p> : <p className="text-sm text-faint">Shuffling the archive…</p>}
+        <div className="card-surface flex flex-col items-center gap-4 p-8">
+          {/* ReactBits BounceCards — the covers tumble in while the wheel turns. */}
+          <BounceCards
+            className="mb-2"
+            images={stripImages}
+            containerWidth={460}
+            containerHeight={200}
+            animationDelay={0.1}
+            animationStagger={0.08}
+            easeType="elastic.out(1, 0.8)"
+            transformStyles={[
+              'rotate(6deg) translate(-110px)',
+              'rotate(-4deg) translate(-40px)',
+              'rotate(3deg) translate(40px)',
+              'rotate(-6deg) translate(110px)'
+            ]}
+            enableHover={false}
+          />
+          {flash ? (
+            <p className="animate-fade-in font-display text-[15px] text-brand2">
+              {prefersOriginal && flash.alttitle ? flash.alttitle : flash.title}
+            </p>
+          ) : (
+            <p className="text-[13px] text-faint">Shuffling the archive…</p>
+          )}
         </div>
       ) : null}
 
@@ -176,10 +200,13 @@ export default function RoulettePage() {
 
       {stage === 'revealed' && picked ? (
         <dialog open className="static m-0 block w-full bg-transparent p-0">
-          <div className="card-surface overflow-hidden border-gold/40 shadow-glow-gold animate-fade-up">
+          <GlowBox className="overflow-hidden" color="rgb(var(--c-gold))">
+          <div className="border border-gold/40 bg-panel animate-fade-up">
             <div className="flex flex-col gap-6 p-6 sm:flex-row sm:p-8">
               <div className="w-44 shrink-0 sm:w-52">
-                <CoverImage image={picked.image} alt={picked.title} eager />
+                <TiltCard max={9}>
+                  <CoverImage image={picked.image} alt={picked.title} eager />
+                </TiltCard>
               </div>
               <div className="min-w-0 flex-1 space-y-3">
                 <p className="font-jp text-xs tracking-[0.5em] text-gold">選ばれた物語</p>
@@ -209,6 +236,7 @@ export default function RoulettePage() {
               </div>
             </div>
           </div>
+          </GlowBox>
         </dialog>
       ) : null}
 

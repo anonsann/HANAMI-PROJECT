@@ -1,0 +1,547 @@
+{
+  "SpotlightCard": {
+    "upstream": "src/ts-tailwind/Components/SpotlightCard/SpotlightCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "SplitText": {
+    "upstream": "src/ts-tailwind/TextAnimations/SplitText/SplitText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "BlurText": {
+    "upstream": "src/ts-tailwind/TextAnimations/BlurText/BlurText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "CountUp": {
+    "upstream": "src/ts-tailwind/TextAnimations/CountUp/CountUp.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "ShinyText": {
+    "upstream": "src/ts-tailwind/TextAnimations/ShinyText/ShinyText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "GradientText": {
+    "upstream": "src/ts-tailwind/TextAnimations/GradientText/GradientText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "TextType": {
+    "upstream": "src/ts-tailwind/TextAnimations/TextType/TextType.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "AnimatedContent": {
+    "upstream": "src/ts-tailwind/Animations/AnimatedContent/AnimatedContent.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "FadeContent": {
+    "upstream": "src/ts-tailwind/Animations/FadeContent/FadeContent.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Aurora": {
+    "upstream": "src/ts-tailwind/Backgrounds/Aurora/Aurora.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Silk": {
+    "upstream": "src/ts-tailwind/Backgrounds/Silk/Silk.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "DotGrid": {
+    "upstream": "src/ts-tailwind/Backgrounds/DotGrid/DotGrid.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "ScrollReveal": {
+    "upstream": "src/ts-tailwind/TextAnimations/ScrollReveal/ScrollReveal.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "ScrollFloat": {
+    "upstream": "src/ts-tailwind/TextAnimations/ScrollFloat/ScrollFloat.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "ScrollVelocity": {
+    "upstream": "src/ts-tailwind/TextAnimations/ScrollVelocity/ScrollVelocity.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "Shuffle": {
+    "upstream": "src/ts-tailwind/TextAnimations/Shuffle/Shuffle.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "SplitFlapText": {
+    "upstream": "src/ts-tailwind/TextAnimations/SplitFlapText/SplitFlapText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "TextLoop": {
+    "upstream": "src/ts-tailwind/TextAnimations/TextLoop/TextLoop.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "TextPressure": {
+    "upstream": "src/ts-tailwind/TextAnimations/TextPressure/TextPressure.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "TrueFocus": {
+    "upstream": "src/ts-tailwind/TextAnimations/TrueFocus/TrueFocus.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "VariableProximity": {
+    "upstream": "src/ts-tailwind/TextAnimations/VariableProximity/VariableProximity.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "WarpText": {
+    "upstream": "src/ts-tailwind/TextAnimations/WarpText/WarpText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "MaskedHeading": {
+    "upstream": "src/ts-tailwind/TextAnimations/MaskedHeading/MaskedHeading.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "EchoText": {
+    "upstream": "src/ts-tailwind/TextAnimations/EchoText/EchoText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "FallingText": {
+    "upstream": "src/ts-tailwind/TextAnimations/FallingText/FallingText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "DecryptedText": {
+    "upstream": "src/ts-tailwind/TextAnimations/DecryptedText/DecryptedText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "FuzzyText": {
+    "upstream": "src/ts-tailwind/TextAnimations/FuzzyText/FuzzyText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "GlitchText": {
+    "upstream": "src/ts-tailwind/TextAnimations/GlitchText/GlitchText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "RotatingText": {
+    "upstream": "src/ts-tailwind/TextAnimations/RotatingText/RotatingText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "ScrambledText": {
+    "upstream": "src/ts-tailwind/TextAnimations/ScrambledText/ScrambledText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "CircularText": {
+    "upstream": "src/ts-tailwind/TextAnimations/CircularText/CircularText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "CurvedLoop": {
+    "upstream": "src/ts-tailwind/TextAnimations/CurvedLoop/CurvedLoop.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "StrokeText": {
+    "upstream": "src/ts-tailwind/TextAnimations/StrokeText/StrokeText.tsx",
+    "category": "TextAnimations",
+    "variant": "ts-tailwind"
+  },
+  "TiltedCard": {
+    "upstream": "src/ts-tailwind/Components/TiltedCard/TiltedCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "DecayCard": {
+    "upstream": "src/ts-tailwind/Components/DecayCard/DecayCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "PixelCard": {
+    "upstream": "src/ts-tailwind/Components/PixelCard/PixelCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "ReflectiveCard": {
+    "upstream": "src/ts-tailwind/Components/ReflectiveCard/ReflectiveCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "ChromaGrid": {
+    "upstream": "src/ts-tailwind/Components/ChromaGrid/ChromaGrid.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "AnimatedList": {
+    "upstream": "src/ts-tailwind/Components/AnimatedList/AnimatedList.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Masonry": {
+    "upstream": "src/ts-tailwind/Components/Masonry/Masonry.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "ScrollStack": {
+    "upstream": "src/ts-tailwind/Components/ScrollStack/ScrollStack.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Stack": {
+    "upstream": "src/ts-tailwind/Components/Stack/Stack.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "CardSwap": {
+    "upstream": "src/ts-tailwind/Components/CardSwap/CardSwap.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "BounceCards": {
+    "upstream": "src/ts-tailwind/Components/BounceCards/BounceCards.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "StaggeredMenu": {
+    "upstream": "src/ts-tailwind/Components/StaggeredMenu/StaggeredMenu.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "LineSidebar": {
+    "upstream": "src/ts-tailwind/Components/LineSidebar/LineSidebar.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "FlowingMenu": {
+    "upstream": "src/ts-tailwind/Components/FlowingMenu/FlowingMenu.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "GooeyNav": {
+    "upstream": "src/ts-tailwind/Components/GooeyNav/GooeyNav.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "PillNav": {
+    "upstream": "src/ts-tailwind/Components/PillNav/PillNav.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Dock": {
+    "upstream": "src/ts-tailwind/Components/Dock/Dock.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "GlassIcons": {
+    "upstream": "src/ts-tailwind/Components/GlassIcons/GlassIcons.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "ElasticSlider": {
+    "upstream": "src/ts-tailwind/Components/ElasticSlider/ElasticSlider.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Stepper": {
+    "upstream": "src/ts-tailwind/Components/Stepper/Stepper.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Counter": {
+    "upstream": "src/ts-tailwind/Components/Counter/Counter.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "CurvedInput": {
+    "upstream": "src/ts-tailwind/Components/CurvedInput/CurvedInput.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "SpecularButton": {
+    "upstream": "src/ts-tailwind/Components/SpecularButton/SpecularButton.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "BorderGlow": {
+    "upstream": "src/ts-tailwind/Components/BorderGlow/BorderGlow.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "MagicBento": {
+    "upstream": "src/ts-tailwind/Components/MagicBento/MagicBento.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Folder": {
+    "upstream": "src/ts-tailwind/Components/Folder/Folder.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Carousel": {
+    "upstream": "src/ts-tailwind/Components/Carousel/Carousel.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "CircularGallery": {
+    "upstream": "src/ts-tailwind/Components/CircularGallery/CircularGallery.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "InfiniteMenu": {
+    "upstream": "src/ts-tailwind/Components/InfiniteMenu/InfiniteMenu.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "ProfileCard": {
+    "upstream": "src/ts-tailwind/Components/ProfileCard/ProfileCard.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "DepthCarousel": {
+    "upstream": "src/ts-tailwind/Components/DepthCarousel/DepthCarousel.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "DriftWall": {
+    "upstream": "src/ts-tailwind/Components/DriftWall/DriftWall.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "AccordionGallery": {
+    "upstream": "src/ts-tailwind/Components/AccordionGallery/AccordionGallery.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "CardNav": {
+    "upstream": "src/ts-tailwind/Components/CardNav/CardNav.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "BubbleMenu": {
+    "upstream": "src/ts-tailwind/Components/BubbleMenu/BubbleMenu.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "MorphSlider": {
+    "upstream": "src/ts-tailwind/Components/MorphSlider/MorphSlider.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "OptionWheel": {
+    "upstream": "src/ts-tailwind/Components/OptionWheel/OptionWheel.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "GlassSurface": {
+    "upstream": "src/ts-tailwind/Components/GlassSurface/GlassSurface.tsx",
+    "category": "Components",
+    "variant": "ts-tailwind"
+  },
+  "Magnet": {
+    "upstream": "src/ts-tailwind/Animations/Magnet/Magnet.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "GlareHover": {
+    "upstream": "src/ts-tailwind/Animations/GlareHover/GlareHover.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "StarBorder": {
+    "upstream": "src/ts-tailwind/Animations/StarBorder/StarBorder.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "ClickSpark": {
+    "upstream": "src/ts-tailwind/Animations/ClickSpark/ClickSpark.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "GlowCursor": {
+    "upstream": "src/ts-tailwind/Animations/GlowCursor/GlowCursor.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "BlobCursor": {
+    "upstream": "src/ts-tailwind/Animations/BlobCursor/BlobCursor.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "ElectricBorder": {
+    "upstream": "src/ts-tailwind/Animations/ElectricBorder/ElectricBorder.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "GradualBlur": {
+    "upstream": "src/ts-tailwind/Animations/GradualBlur/GradualBlur.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Noise": {
+    "upstream": "src/ts-tailwind/Animations/Noise/Noise.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "LogoLoop": {
+    "upstream": "src/ts-tailwind/Animations/LogoLoop/LogoLoop.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "PixelTransition": {
+    "upstream": "src/ts-tailwind/Animations/PixelTransition/PixelTransition.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "ScrollExpand": {
+    "upstream": "src/ts-tailwind/Animations/ScrollExpand/ScrollExpand.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "MetaBalls": {
+    "upstream": "src/ts-tailwind/Animations/MetaBalls/MetaBalls.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Ribbons": {
+    "upstream": "src/ts-tailwind/Animations/Ribbons/Ribbons.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "ImageTrail": {
+    "upstream": "src/ts-tailwind/Animations/ImageTrail/ImageTrail.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "ShapeBlur": {
+    "upstream": "src/ts-tailwind/Animations/ShapeBlur/ShapeBlur.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "StickerPeel": {
+    "upstream": "src/ts-tailwind/Animations/StickerPeel/StickerPeel.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Cubes": {
+    "upstream": "src/ts-tailwind/Animations/Cubes/Cubes.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Crosshair": {
+    "upstream": "src/ts-tailwind/Animations/Crosshair/Crosshair.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "MagnetLines": {
+    "upstream": "src/ts-tailwind/Animations/MagnetLines/MagnetLines.tsx",
+    "category": "Animations",
+    "variant": "ts-tailwind"
+  },
+  "Beams": {
+    "upstream": "src/ts-tailwind/Backgrounds/Beams/Beams.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "LightRays": {
+    "upstream": "src/ts-tailwind/Backgrounds/LightRays/LightRays.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Particles": {
+    "upstream": "src/ts-tailwind/Backgrounds/Particles/Particles.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "DotField": {
+    "upstream": "src/ts-tailwind/Backgrounds/DotField/DotField.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Iridescence": {
+    "upstream": "src/ts-tailwind/Backgrounds/Iridescence/Iridescence.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Plasma": {
+    "upstream": "src/ts-tailwind/Backgrounds/Plasma/Plasma.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Waves": {
+    "upstream": "src/ts-tailwind/Backgrounds/Waves/Waves.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "GridMotion": {
+    "upstream": "src/ts-tailwind/Backgrounds/GridMotion/GridMotion.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "RippleGrid": {
+    "upstream": "src/ts-tailwind/Backgrounds/RippleGrid/RippleGrid.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "SlicedWaves": {
+    "upstream": "src/ts-tailwind/Backgrounds/SlicedWaves/SlicedWaves.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "GradientBlinds": {
+    "upstream": "src/ts-tailwind/Backgrounds/GradientBlinds/GradientBlinds.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "FloatingLines": {
+    "upstream": "src/ts-tailwind/Backgrounds/FloatingLines/FloatingLines.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Lightning": {
+    "upstream": "src/ts-tailwind/Backgrounds/Lightning/Lightning.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "DarkVeil": {
+    "upstream": "src/ts-tailwind/Backgrounds/DarkVeil/DarkVeil.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Orb": {
+    "upstream": "src/ts-tailwind/Backgrounds/Orb/Orb.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Topography": {
+    "upstream": "src/ts-tailwind/Backgrounds/Topography/Topography.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "Threads": {
+    "upstream": "src/ts-tailwind/Backgrounds/Threads/Threads.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  },
+  "PixelSnow": {
+    "upstream": "src/ts-tailwind/Backgrounds/PixelSnow/PixelSnow.tsx",
+    "category": "Backgrounds",
+    "variant": "ts-tailwind"
+  }
+}

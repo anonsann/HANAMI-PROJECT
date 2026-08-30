@@ -14,8 +14,8 @@ import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
 import { TagPicker, ChipGroup } from '../components/FiltersPanel';
 import { CoverImage } from '../components/data';
-import { Pager, Select, Skeleton, ErrorState, EmptyState, RatingBar, Field } from '../components/ui';
-import { Reveal } from '../components/visual';
+import { Card, Pager, Select, Skeleton, ErrorState, EmptyState, RatingBar, Field } from '../components/ui';
+import { Glare, Reveal, TiltCard } from '../components/visual';
 import { Icon } from '../components/icons';
 
 const PAGE_SIZE = 48;
@@ -118,16 +118,22 @@ export default function CharactersPage() {
       ) : (
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
           {res.data!.results.map((c) => (
-            <Link key={`${c.id}-${c.aid ?? ''}`} to={`/c/${c.id}`} className="card-surface group overflow-hidden transition-shadow hover:shadow-lift">
-              <CoverImage image={c.image} alt={c.name} aspect="aspect-[5/6]" sizes="(min-width:768px) 180px, 30vw" className="rounded-none border-0" />
-              <div className="p-2.5">
-                <h3 className="truncate text-sm font-medium text-ink group-hover:text-brand">{c.name}</h3>
-                <p className="truncate text-[11px] text-faint">
-                  {c.sex?.[0] ? `${SEXES[c.sex[0]] ?? ''} · ` : ''}
-                  {(c.vns ?? []).length > 0 ? `${(c.vns ?? []).length} appearance${(c.vns ?? []).length > 1 ? 's' : ''}` : c.original ?? ''}
-                </p>
-              </div>
-            </Link>
+            <TiltCard key={`${c.id}-${c.aid ?? ''}`} max={6}>
+              <Card className="h-full overflow-hidden">
+                <Link to={`/c/${c.id}`} className="group block">
+                  <Glare>
+                    <CoverImage image={c.image} alt={c.name} aspect="aspect-[5/6]" sizes="(min-width:768px) 180px, 30vw" className="rounded-none border-0" />
+                  </Glare>
+                  <div className="p-2.5">
+                    <h3 className="truncate text-[13px] font-medium text-ink group-hover:text-brand">{c.name}</h3>
+                    <p className="truncate text-[11px] text-faint">
+                      {c.sex?.[0] ? `${SEXES[c.sex[0]] ?? ''} · ` : ''}
+                      {(c.vns ?? []).length > 0 ? `${(c.vns ?? []).length} appearance${(c.vns ?? []).length > 1 ? 's' : ''}` : c.original ?? ''}
+                    </p>
+                  </div>
+                </Link>
+              </Card>
+            </TiltCard>
           ))}
         </div>
       )}

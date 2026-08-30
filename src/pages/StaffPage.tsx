@@ -11,7 +11,7 @@ import { PageHeader } from '../components/PageBits';
 import { CoverImage, ExtlinkChips } from '../components/data';
 import { VnCard } from '../components/VnCard';
 import { Pager, Select, Skeleton, ErrorState, EmptyState, Toggle, Field } from '../components/ui';
-import { Reveal } from '../components/visual';
+import { Reveal, SlideIn } from '../components/visual';
 import { Icon } from '../components/icons';
 
 const PAGE_SIZE = 48;
@@ -94,7 +94,7 @@ export default function StaffPage() {
       ) : rows.length === 0 ? (
         <EmptyState title="No staff found." />
       ) : (
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        <SlideIn className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((s) => (
             <Link key={`${s.id}-${s.aid ?? 'm'}`} to={`/s/${s.id}`} className="card-surface group flex items-center gap-3 p-4 transition-colors hover:border-brand/40">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-panel2 font-jp text-lg text-sky">
@@ -111,7 +111,7 @@ export default function StaffPage() {
               <Icon name="chevronRight" size={14} className="text-faint" />
             </Link>
           ))}
-        </div>
+        </SlideIn>
       )}
       {totalPages > 1 ? <Pager page={page} totalPages={totalPages} onChange={setPage} /> : null}
     </div>

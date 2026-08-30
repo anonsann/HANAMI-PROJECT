@@ -12,9 +12,11 @@ import { useAuth } from '../store/auth';
 import { useUlist } from '../store/ulist';
 import { useBookmarks } from '../store/bookmarks';
 import { PageHeader } from '../components/PageBits';
+import { Magnetize, Shiny } from '../components/visual';
 import { CoverImage } from '../components/data';
 import { VoteStars } from '../components/visual';
 import { Pager, Select, Skeleton, ErrorState, EmptyState, Modal, Tabs, Toggle, toast } from '../components/ui';
+import { Folder, Stepper } from '../reactbits';
 import { Icon } from '../components/icons';
 import { commonToggle } from '../lib/pageUtils';
 
@@ -84,9 +86,13 @@ function ShelfGate() {
   return (
     <div className="grid gap-5 lg:grid-cols-2">
       <PageHeader kana="帳簿" title="My Shelf" />
-      <div className="card-surface space-y-4 p-6 lg:col-start-1">
-        <h2 className="section-title">Connect your VNDB account</h2>
-        <p className="text-sm leading-relaxed text-mute">
+      <div className="vndb-box space-y-4 p-5 lg:col-start-1">
+        <div className="flex items-center justify-between gap-2 border-b border-line pb-2">
+          <h2 className="font-display text-[15px] font-semibold text-brand2">Connect your VNDB account</h2>
+          <Shiny className="text-[10px] text-faint">3 steps</Shiny>
+        </div>
+        <ConnectSteps />
+        <p className="text-[13px] leading-relaxed text-mute">
           Your VNDB list lives on vndb.org — Hanami reads and writes it through the official API. Create a
           personal token under{' '}
           <a href="https://vndb.org/u/tokens" target="_blank" rel="noopener noreferrer" className="link-fancy">
@@ -111,9 +117,11 @@ function ShelfGate() {
         />
         {auth.error ? <p role="alert" className="text-sm text-bad">{auth.error}</p> : null}
         <div className="flex flex-wrap items-center gap-4">
-          <button type="button" className="btn-primary" disabled={auth.busy} onClick={() => void auth.login(token, remember)}>
-            {auth.busy ? 'Verifying…' : 'Sign in with token'}
-          </button>
+          <Magnetize strength={12}>
+            <button type="button" className="btn-primary" disabled={auth.busy} onClick={() => void auth.login(token, remember)}>
+              {auth.busy ? 'Verifying…' : 'Sign in with token'}
+            </button>
+          </Magnetize>
           <Toggle checked={remember} onChange={setRemember} label="Remember on this device" />
         </div>
         <p className="text-[11px] leading-relaxed text-faint">
@@ -122,9 +130,9 @@ function ShelfGate() {
         </p>
       </div>
 
-      <div className="card-surface space-y-4 p-6">
-        <h2 className="section-title">Peek at a public shelf</h2>
-        <p className="text-sm text-mute">No account? Browse any user's public list — votes and labels included.</p>
+      <div className="vndb-box space-y-4 p-5">
+        <h2 className="border-b border-line pb-2 font-display text-[15px] font-semibold text-brand2">Peek at a public shelf</h2>
+        <p className="text-[13px] text-mute">No account? Browse any user's public list — votes and labels included.</p>
         <div className="flex gap-2">
           <input className="input" placeholder="VNDB username, e.g. yorhel" value={guest} onChange={(e) => setGuest(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && void lookupGuest()} aria-label="VNDB username" />
           <button type="button" className="btn-ghost" onClick={() => void lookupGuest()} disabled={guestBusy}>
@@ -134,6 +142,42 @@ function ShelfGate() {
         {guestError ? <p role="alert" className="text-sm text-bad">{guestError}</p> : null}
       </div>
     </div>
+  );
+}
+
+/** ReactBits Stepper walking through how to mint a VNDB API token. */
+function ConnectSteps() {
+  return (
+    <Stepper
+      initialStep={1}
+      stepCircleContainerClassName="!gap-1 !p-0"
+      stepContainerClassName="!px-0"
+      contentClassName="!p-0 !min-h-0"
+      footerClassName="!px-0 !pb-0 !border-0"
+      backButtonProps={{ className: 'btn-quiet text-[12px] px-2 py-1' }}
+      nextButtonProps={{ className: 'btn-ghost text-[12px] px-2 py-1' }}
+      backButtonText="Back"
+      nextButtonText="Next"
+    >
+      <div>
+        <p className="text-[12px] font-semibold text-brand2">Open vndb.org → Applications</p>
+        <p className="mt-1 text-[12px] text-mute">
+          Sign in on VNDB, then open <span className="font-mono">u/tokens</span> and create a personal token.
+        </p>
+      </div>
+      <div>
+        <p className="text-[12px] font-semibold text-brand2">Grant listread + listwrite</p>
+        <p className="mt-1 text-[12px] text-mute">
+          <strong>listread</strong> lets Hanami show your shelf; <strong>listwrite</strong> lets you edit it.
+        </p>
+      </div>
+      <div>
+        <p className="text-[12px] font-semibold text-brand2">Paste it below</p>
+        <p className="mt-1 text-[12px] text-mute">
+          The token is sent only to *.vndb.org over HTTPS and stays in this browser.
+        </p>
+      </div>
+    </Stepper>
   );
 }
 
@@ -511,28 +555,36 @@ function BookmarksSection() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="section-title text-sm">Local bookmarks</h2>
+        <Shiny className="text-[13px] text-brand2">Local bookmarks</Shiny>
         <span className="text-xs text-faint">saved in this browser only</span>
       </div>
-      <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((b) => (
-          <div key={b.id} className="card-surface group flex items-center gap-3 p-2.5">
-            {b.image ? (
-              <img src={b.image} alt={b.title} loading="lazy" className="h-16 w-12 rounded-md object-cover object-top" />
-            ) : (
-              <div className="grid h-16 w-12 place-items-center rounded-md bg-panel2 text-faint">
-                <Icon name="book" size={16} />
+      <div className="flex flex-wrap items-start gap-6">
+        {/* ReactBits Folder — the local stack, fanned open on click. */}
+        <Folder color="rgb(var(--c-brand))" size={1} items={items.slice(0, 3).map((b) => (
+          <Link key={b.id} to={`/v/${b.id}`} className="block truncate text-[12px] text-ink hover:text-brand">
+            {b.title}
+          </Link>
+        ))} />
+        <ul className="grid min-w-0 flex-1 gap-2.5 sm:grid-cols-2">
+          {items.map((b) => (
+            <li key={b.id} className="card-surface group flex items-center gap-3 p-2.5">
+              {b.image ? (
+                <img src={b.image} alt={b.title} loading="lazy" className="h-16 w-12 rounded-sm object-cover object-top" />
+              ) : (
+                <div className="grid h-16 w-12 place-items-center rounded-sm bg-panel2 text-faint">
+                  <Icon name="book" size={16} />
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <Link to={`/v/${b.id}`} className="truncate text-[13px] font-medium text-ink hover:text-brand">{b.title}</Link>
+                <p className="text-[11px] text-faint">{b.id} · {b.rating ? formatRating(b.rating) : 'not rated'}</p>
               </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <Link to={`/v/${b.id}`} className="truncate text-sm font-medium text-ink hover:text-brand">{b.title}</Link>
-              <p className="text-[11px] text-faint">{b.id} · {b.rating ? formatRating(b.rating) : 'not rated'}</p>
-            </div>
-            <button type="button" className="btn-quiet px-1.5 text-xs" onClick={() => remove(b.id)} aria-label={`Remove bookmark ${b.title}`}>
-              <Icon name="trash" size={13} />
-            </button>
-          </div>
-        ))}
+              <button type="button" className="btn-quiet px-1.5 text-[12px]" onClick={() => remove(b.id)} aria-label={`Remove bookmark ${b.title}`}>
+                <Icon name="trash" size={13} />
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

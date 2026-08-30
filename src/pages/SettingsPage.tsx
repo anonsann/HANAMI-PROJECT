@@ -6,14 +6,18 @@ import { vndb } from '../lib/vndb/client';
 import { SPOILER_LEVELS } from '../lib/vndb/enums';
 import { useInterval } from '../hooks';
 import { PageHeader } from '../components/PageBits';
+import { Magnetize, Shiny } from '../components/visual';
 import { Select, Toggle } from '../components/ui';
 import { Icon } from '../components/icons';
+import { usePalette } from '../lib/theme';
+import { Counter } from '../reactbits';
 
 export default function SettingsPage() {
   useTitle('Tuning');
   const settings = useSettings();
   const auth = useAuth();
   const [baseEdit, setBaseEdit] = useState(settings.apiBase);
+  const palette = usePalette();
   const [budget, setBudget] = useState(vndb.requestsInWindow());
   const [cacheN, setCacheN] = useState(vndb.cacheSize());
 
@@ -36,8 +40,16 @@ export default function SettingsPage() {
       <Section title="Appearance" kana="装飾">
         <Row label="Theme" hint="Midnight is the house style; Daybreak for sunlit reading.">
           <div className="flex gap-2">
-            <ThemeCard id="dark" name="Midnight" current={settings.theme} onSelect={settings.setTheme} />
-            <ThemeCard id="light" name="Daybreak" current={settings.theme} onSelect={settings.setTheme} />
+            {(['light', 'dark'] as const).map((id) => (
+              <Magnetize key={id} strength={12}>
+                <ThemeCard
+                  id={id}
+                  name={id === 'dark' ? 'Midnight' : 'Daybreak'}
+                  current={settings.theme}
+                  onSelect={settings.setTheme}
+                />
+              </Magnetize>
+            ))}
           </div>
         </Row>
         <Row label="Motion" hint="Dials down petals, tilts and reveals. Your OS preference is always honored.">
@@ -127,7 +139,7 @@ export default function SettingsPage() {
               </button>
             </div>
             {!auth.canWrite() ? (
-              <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-xs text-warn">
+              <p className="rounded-sm border border-warn/40 bg-warn/10 px-3 py-2 text-xs text-warn">
                 This token lacks <strong>listwrite</strong> — list edits will be read-only. Create a token
                 with listwrite at vndb.org/u/tokens to manage your shelf from here.
               </p>
@@ -175,18 +187,24 @@ export default function SettingsPage() {
         </Row>
         <Row label="Rate budget" hint="Requests started in the rolling 5-minute window (server allows 200).">
           <div className="flex items-center gap-3">
-            <div className="h-2 w-44 overflow-hidden rounded-full bg-line/60">
+            <div className="h-2 w-44 overflow-hidden rounded-sm bg-line/60">
               <div
-                className={`h-full rounded-full transition-[width] ${budget > 160 ? 'bg-bad' : budget > 110 ? 'bg-warn' : 'bg-good'}`}
+                className={`h-full rounded-sm transition-[width] ${budget > 160 ? 'bg-bad' : budget > 110 ? 'bg-warn' : 'bg-good'}`}
                 style={{ width: `${Math.min(100, (budget / 200) * 100)}%` }}
               />
             </div>
-            <span className="font-mono text-xs text-mute">{budget} / 200</span>
+            <span className="inline-flex items-baseline gap-1 text-[13px] text-mute">
+              <Counter value={budget} fontSize={14} padding={0} gap={0} horizontalPadding={2} textColor={palette.brand} />
+              <span className="text-faint">/ 200</span>
+            </span>
           </div>
         </Row>
         <Row label="Local cache" hint="Responses cached in this browser to keep the archive snappy.">
           <div className="flex items-center gap-3 text-sm text-mute">
-            <span className="font-mono text-xs">{cacheN} entries</span>
+            <span className="inline-flex items-baseline gap-1 text-[13px]">
+              <Counter value={cacheN} fontSize={14} padding={0} gap={0} horizontalPadding={2} textColor={palette.brand} />
+              <span className="text-faint">entries</span>
+            </span>
             <button
               type="button"
               className="btn-ghost py-1.5 text-xs"
@@ -206,13 +224,17 @@ export default function SettingsPage() {
 
 function Section({ title, kana, children }: { title: string; kana: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4">
-      <h2 className="flex items-center gap-3">
-        <span className="grid size-8 place-items-center rounded-lg border border-brand/30 bg-panel2 font-jp text-sm text-brand">{kana}</span>
-        <span className="section-title">{title}</span>
-        <span className="h-px flex-1 bg-line/60" aria-hidden="true" />
-      </h2>
-      <div className="card-surface divide-y divide-line/60">{children}</div>
+    <section className="vndb-box">
+      <div className="vndb-box-title">
+        <span className="flex items-center gap-2">
+          <span className="grid size-5 place-items-center rounded-sm border border-brand/30 bg-panel font-jp text-[11px] text-brand">
+            {kana}
+          </span>
+          {title}
+        </span>
+        <Shiny className="text-[10px] normal-case tracking-normal text-faint">tuning</Shiny>
+      </div>
+      <div className="divide-y divide-line">{children}</div>
     </section>
   );
 }
@@ -229,21 +251,28 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
   );
 }
 
+/**
+ * Theme swatch. The preview mirrors the two VNDB-derived palettes in
+ * `styles/index.css` (default skin / Angelic Serenade).
+ */
 function ThemeCard({ id, name, current, onSelect }: { id: 'dark' | 'light'; name: string; current: string; onSelect: (t: 'dark' | 'light') => void }) {
   const active = current === id;
+  const dark = id === 'dark';
   return (
     <button
       type="button"
       aria-pressed={active}
       onClick={() => onSelect(id)}
-      className={`group w-36 overflow-hidden rounded-xl border text-left shadow-card transition-all ${active ? 'border-brand shadow-glow' : 'border-line hover:border-faint'}`}
+      className={`group w-36 overflow-hidden rounded-sm border text-left transition-all ${active ? 'border-brand' : 'border-line hover:border-faint'}`}
     >
-      <span className={`block h-16 ${id === 'dark' ? 'bg-[#0b0914]' : 'bg-[#faf6f0]'} relative`}>
-        <span className={`absolute left-3 top-3 block h-6 w-10 rounded ${id === 'dark' ? 'bg-[#1e1930]' : 'bg-white shadow-sm'}`} />
-        <span className={`absolute bottom-2 left-3 block h-1.5 w-16 rounded-full ${id === 'dark' ? 'bg-brand/70' : 'bg-[#de548a]'}`} />
-        <span className={`absolute bottom-2 right-3 block h-1.5 w-6 rounded-full ${id === 'dark' ? 'bg-gold/70' : 'bg-[#ae8030]'}`} />
+      <span className={`relative block h-16 ${dark ? 'bg-[#08121e]' : 'bg-[#f5f7fa]'}`}>
+        <span className={`absolute left-3 top-3 block h-6 w-10 rounded-sm ${dark ? 'bg-[#071c30]' : 'bg-white'}`} />
+        <span className={`absolute bottom-2 left-3 block h-1.5 w-16 rounded-sm ${dark ? 'bg-[#7bb8dd]/70' : 'bg-[#1a5db4]'}`} />
+        <span className={`absolute bottom-2 right-3 block h-1.5 w-6 rounded-sm ${dark ? 'bg-[#e4aa44]/80' : 'bg-[#b5761a]'}`} />
       </span>
-      <span className="block bg-panel px-3 py-2 text-xs text-ink">{name}</span>
+      <span className={`block px-3 py-2 text-[12px] ${active ? 'bg-brand/10 text-brand' : 'bg-panel text-ink'}`}>
+        {name}
+      </span>
     </button>
   );
 }

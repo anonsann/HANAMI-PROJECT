@@ -4,9 +4,29 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'node_modules'] },
+  // `src/reactbits/**` is vendored verbatim from DavidHDev/react-bits by
+  // `npm run reactbits:sync` + `npm run reactbits:theme`; upstream style is not ours to police.
+  { ignores: ['dist', 'coverage', 'node_modules', 'src/reactbits/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        URL: 'readonly',
+        Buffer: 'readonly',
+        TextDecoder: 'readonly',
+        setTimeout: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off'
+    }
+  },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {

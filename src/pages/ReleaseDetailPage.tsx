@@ -7,7 +7,7 @@ import { useTitle } from '../hooks';
 import { formatVndbDate, formatRating } from '../lib/format';
 import { languageName, mediaTypeName, platformName, producerTypeName, resolutionLabel, voicedLabel } from '../lib/vndb/enums';
 import { CoverImage, ExtlinkChips } from '../components/data';
-import { Reveal } from '../components/visual';
+import { Glare, Reveal, Scramble, TiltCard } from '../components/visual';
 import { Skeleton, ErrorState, EmptyState } from '../components/ui';
 import { Icon } from '../components/icons';
 import { Lightbox } from '../components/Lightbox';
@@ -36,12 +36,18 @@ export default function ReleaseDetailPage() {
       <Reveal className="card-surface p-5 sm:p-7">
         <div className="flex flex-col gap-6 sm:flex-row">
           <div className="w-44 shrink-0">
-            <CoverImage image={images[0]} alt={rel.title} eager />
+            <TiltCard max={8}>
+              <Glare>
+                <CoverImage image={images[0]} alt={rel.title} eager />
+              </Glare>
+            </TiltCard>
           </div>
           <div className="min-w-0 flex-1 space-y-3">
             <div>
               <p className="font-jp text-xs tracking-[0.4em] text-brand">リリース</p>
-              <h1 className="mt-1 font-serif text-2xl font-semibold text-ink">{rel.title}</h1>
+              <h1 className="mt-1 font-display text-xl font-semibold text-brand2 sm:text-2xl">
+                <Scramble text={rel.title} />
+              </h1>
               {rel.alttitle ? <p className="mt-1 font-jp text-mute">{rel.alttitle}</p> : null}
             </div>
             <div className="flex flex-wrap gap-1.5 text-xs">

@@ -9,6 +9,7 @@ import { LANGUAGES, PLATFORMS, VOICED, MINAGES } from '../lib/vndb/enums';
 import { useTitle } from '../hooks';
 import { useSettings } from '../store/settings';
 import { PageHeader } from '../components/PageBits';
+import { Magnetize, SlideIn } from '../components/visual';
 import { ChipGroup } from '../components/FiltersPanel';
 import { CoverImage, PlatformBadges, LanguageBadges } from '../components/data';
 import { Pager, Select, Skeleton, ErrorState, EmptyState, Toggle, Field } from '../components/ui';
@@ -109,6 +110,7 @@ export default function ReleasesBrowsePage() {
       ) : rows.length === 0 ? (
         <EmptyState title="No editions match." hint="Broaden the filters — 'official' or year ranges hide fan releases." />
       ) : (
+        <SlideIn>
         <ul className="space-y-2.5">
           {rows.map((r) => {
             const front = (r.images ?? []).find((i) => i.type === 'pkgfront') ?? r.images?.[0];
@@ -141,15 +143,18 @@ export default function ReleasesBrowsePage() {
             );
           })}
         </ul>
+        </SlideIn>
       )}
 
       {count !== undefined && totalPages > 1 ? (
         <Pager page={page} totalPages={totalPages} onChange={setPage} />
       ) : res.data?.more ? (
         <div className="flex justify-center">
-          <button type="button" className="btn-ghost" onClick={() => setPage((p) => p + 1)}>
-            <Icon name="plus" size={15} /> Next page
-          </button>
+          <Magnetize strength={14}>
+            <button type="button" className="btn-ghost" onClick={() => setPage((p) => p + 1)}>
+              <Icon name="plus" size={15} /> Next page
+            </button>
+          </Magnetize>
         </div>
       ) : null}
     </div>

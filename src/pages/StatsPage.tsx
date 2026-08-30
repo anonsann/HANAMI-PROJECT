@@ -7,8 +7,8 @@ import { useTitle } from '../hooks';
 import { VN_LENGTHS, DEVSTATUS, languageName, platformName } from '../lib/vndb/enums';
 import { PageHeader } from '../components/PageBits';
 import { BarChart, DonutChart, LineChart, type SeriesPoint } from '../components/Charts';
-import { CountUp, Reveal } from '../components/visual';
-import { Skeleton } from '../components/ui';
+import { CountUp, Reveal, Shiny } from '../components/visual';
+import { Card, Skeleton } from '../components/ui';
 import { Icon, type IconName } from '../components/icons';
 
 interface Weave {
@@ -188,20 +188,18 @@ export default function StatsPage() {
             ['Tags', stats.data.tags, 'tag'],
             ['Traits', stats.data.traits, 'sparkle']
           ] as [string, number, IconName][]).map(([label, value, icon]) => (
-            <div key={label} className="card-surface relative overflow-hidden p-4">
+            <Card key={label} className="relative overflow-hidden p-4">
               <Icon name={icon} size={88} className="pointer-events-none absolute -right-3 -top-3 text-panel2" aria-hidden="true" />
-              <p className="font-display text-3xl text-gold">
+              <p className="font-display text-2xl font-semibold text-brand">
                 <CountUp value={value} />
               </p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-faint">{label}</p>
-            </div>
+              <Shiny className="mt-1 text-[10px] text-faint">{label}</Shiny>
+            </Card>
           ))}
-          <div className="card-surface relative overflow-hidden border-gold/30 p-4">
-            <p className="font-display text-3xl text-brand text-glow">∑</p>
-            <p className="mt-1 text-xs uppercase tracking-wider text-faint">
-              {formatSumTotal(stats.data)}
-            </p>
-          </div>
+          <Card className="relative overflow-hidden border-gold/40 p-4">
+            <p className="font-display text-2xl font-semibold text-gold">∑</p>
+            <Shiny className="mt-1 text-[10px] text-faint">{formatSumTotal(stats.data)}</Shiny>
+          </Card>
         </Reveal>
       ) : null}
 

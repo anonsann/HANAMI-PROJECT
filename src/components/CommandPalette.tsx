@@ -5,6 +5,8 @@ import { VN_CARD, CHARACTER_CARD, PRODUCER_CARD, STAFF_CARD } from '../lib/vndb/
 import { extractVndbid, squeeze } from '../lib/utils';
 import { useDebouncedValue } from '../hooks';
 import { Icon } from './icons';
+import { GlassPanel } from './ui';
+import { Shiny } from './visual';
 import type { Character, Producer, Staff, VisualNovel } from '../lib/vndb/types';
 
 interface Result {
@@ -143,24 +145,24 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="card-surface w-full max-w-xl overflow-hidden border-brand/30 shadow-lift animate-fade-up">
-        <div className="flex items-center gap-2 border-b border-line px-4 py-3">
+      <GlassPanel className="w-full max-w-xl overflow-hidden animate-fade-up" width="100%">
+        <div className="flex items-center gap-2 border-b border-line px-4 py-2.5">
           <Icon name="search" size={18} className="text-faint" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search novels, characters, producers, staff… (try v17 or 'fate')"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-faint"
+            className="w-full bg-transparent text-[13px] outline-none placeholder:text-faint"
             aria-label="Search the VNDB database"
           />
           {status === 'loading' ? <Icon name="refresh" size={16} className="animate-spin-slow text-faint" /> : null}
-          <kbd className="rounded border border-line bg-panel2 px-1.5 py-0.5 text-[10px] text-faint">esc</kbd>
+          <kbd className="rounded-sm border border-line bg-panel2 px-1.5 py-0.5 text-[10px] text-faint">esc</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto p-1.5" role="listbox">
           {grouped.length === 0 && status === 'idle' && query.trim() ? (
             <div className="px-3 py-6 text-center text-sm text-faint">
-              No quick matches. Press <kbd className="rounded border border-line bg-panel2 px-1 text-[10px]">Enter</kbd> to open full browse.
+              No quick matches. Press <kbd className="rounded-sm border border-line bg-panel2 px-1 text-[10px]">Enter</kbd> to open full browse.
             </div>
           ) : (
             grouped.map((r, i) => (
@@ -171,24 +173,24 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                 aria-selected={i === active}
                 onMouseEnter={() => setActive(i)}
                 onClick={() => go(r)}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                className={`flex w-full items-center gap-3 rounded-sm px-3 py-2 text-left transition-colors ${
                   i === active ? 'bg-brand/15 text-brand' : 'text-ink'
                 }`}
               >
                 <span className="w-20 shrink-0 text-[10px] font-semibold uppercase tracking-wider text-faint">
                   {KIND_META[r.kind].label}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm">{r.title}</span>
+                <span className="min-w-0 flex-1 truncate text-[13px]">{r.title}</span>
                 {r.sub ? <span className="hidden max-w-40 truncate text-xs text-faint sm:block">{r.sub}</span> : null}
               </button>
             ))
           )}
         </div>
-        <div className="flex items-center justify-between border-t border-line px-4 py-2 text-[10px] text-faint">
+        <div className="flex items-center justify-between border-t border-line px-4 py-1.5 text-[10px] text-faint">
           <span>↑↓ navigate · ↵ open</span>
-          <span>Live from api.vndb.org</span>
+          <Shiny className="text-[9px] normal-case tracking-normal text-faint">live from api.vndb.org</Shiny>
         </div>
-      </div>
+      </GlassPanel>
     </div>
   );
 }

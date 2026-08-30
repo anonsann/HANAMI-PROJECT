@@ -12,7 +12,7 @@ import { ExtlinkChips } from '../components/data';
 import { VnCard } from '../components/VnCard';
 import { Pager, Select, Skeleton, ErrorState, EmptyState } from '../components/ui';
 import { useDebouncedValue } from '../hooks';
-import { Reveal } from '../components/visual';
+import { Reveal, SlideIn } from '../components/visual';
 import { Icon } from '../components/icons';
 
 const PAGE_SIZE = 48;
@@ -78,7 +78,7 @@ export default function ProducersPage() {
       ) : (res.data?.results.length ?? 0) === 0 ? (
         <EmptyState title="No producers found." />
       ) : (
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        <SlideIn className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {res.data!.results.map((p) => (
             <Link key={`${p.id}-${p.aid ?? ''}`} to={`/p/${p.id}`} className="card-surface group flex items-center gap-3 p-4 transition-colors hover:border-brand/40">
               <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-panel2 font-jp text-lg text-gold">
@@ -95,7 +95,7 @@ export default function ProducersPage() {
               <Icon name="chevronRight" size={14} className="text-faint" />
             </Link>
           ))}
-        </div>
+        </SlideIn>
       )}
       {totalPages > 1 ? <Pager page={page} totalPages={totalPages} onChange={setPage} /> : null}
     </div>
